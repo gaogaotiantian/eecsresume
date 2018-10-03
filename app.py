@@ -79,7 +79,7 @@ def getGmailService():
 def sendEmail(pdfRaw, email):
     message = Message("Resume review from EECSResume",
             sender="eecsresume@gmail.com",
-            recipients=["eecsresume@gmail.com", "gaogaotiantian@hotmail.com"])
+            recipients=["eecsresume@gmail.com"])
 
     message.body = "Email: {}\n".format(email)
 
