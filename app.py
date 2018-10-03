@@ -98,7 +98,6 @@ def task():
         fileMetadata = {'name': shortLink}
         media = MediaIoBaseUpload(fio, mimetype='application/pdf')
         gDriveFile = service.files().create(body = fileMetadata, media_body = media, fields = 'id').execute()
-        print(gDriveFile.get('id'))
         t = TaskDb()
         t.short_link = shortLink
         t.file_link = gDriveFile.get('id')
