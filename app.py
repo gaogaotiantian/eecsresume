@@ -26,7 +26,6 @@ from google.oauth2 import service_account
 
 DATABASE_URL = None
 if os.environ.get('DATABASE_URL') != None:
-    print("123")
     DATABASE_URL = os.environ.get('DATABASE_URL')
 
 credentialRaw = os.environ.get('GOOGLE_APP_CREDENTIAL')
@@ -77,25 +76,38 @@ def getGmailService():
 
     return service
 
-def sendEmail(pdfRaw):
-    message = Message("Resume",
+def sendEmail(pdfRaw, email):
+    message = Message("Resume review from EECSResume",
             sender="eecsresume@gmail.com",
-            recipients=["gaogaotiantian@hotmail.com"])
+            recipients=["eecsresume@gmail.com", "gaogaotiantian@hotmail.com"])
 
-    message.body = "resume filed"
+    message.body = "Email: {}\n".format(email)
 
     message.attach("resume.pdf", 'application/pdf', pdfRaw)
 
     try:
         mail.send(message)
-        print("email sent")
+        print("Got a resume from {}".format(email))
+    except Exception as e:
+        print(e)
+
+def sendConfirmEmail(email):
+    print(type(email))
+    print(email)
+    message = Message("Resume review confirmation from EECSResume",
+            sender="eecsresume@gmail.com",
+            recipients=[email])
+    message.body = "您好！\n您的Resume我已经收到，我会在数个工作日内给您回复。如果有什么问题，可以直接回复这条消息。\n\n- EECSResume"
+
+    try:
+        mail.send(message)
+        print("Send confirmation to {}".format(email))
     except Exception as e:
         print(e)
 
 chars = string.ascii_uppercase + string.digits
 def getShortLink():
     while True:
-        print("getlink")
         s = ''.join(random.choice(chars) for _ in range(6))
         check = TaskDb.query.filter_by(short_link = s).first()
         if check == None:
@@ -109,15 +121,15 @@ def err(err_code, err_msg):
 @app.route('/api/v1/task', methods = ['GET', 'POST'])
 def task():
     if request.method == 'POST':
-        print("get post")
         f = request.files.get("resume")
+        formData = dict(request.form)
+
         if f == None:
             return err(400, "Can not find attached file. It should be a pdf file.")
         data = request.json
 
         try:
-            email = "test@example.com"
-            note  = "testtest"
+            email = formData["email"][0]
         except:
             return err(400, "Wrong parameters")
 
@@ -130,22 +142,35 @@ def task():
         #gDriveFile = service.files().create(body = fileMetadata, media_body = media, fields = 'id').execute()
 
         # Gmail part
-        sendEmail(f.read())
+        sendEmail(f.read(), email)
+        sendConfirmEmail(email)
 
         t = TaskDb()
         t.short_link = shortLink
-        #t.file_link = gDriveFile.get('id')
         t.email = email
         t.status = statusEnum.sent
-        t.note = note
+        t.note = ""
         
         db.session.add(t)
         db.session.commit()
     return success({"msg":"success"})
 
 @app.route('/')
+@app.route('/index')
 def index():
     return render_template('index.html')
+
+@app.route('/procedure')
+def procedure():
+    return render_template('procedure.html')
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/submit')
+def submit():
+    return render_template('submit.html')
 
 if __name__ == '__main__':
     app.run(debug = True)
