@@ -6,10 +6,15 @@ import random
 import datetime
 import io
 import json
+import base64
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
 
 # other published packages
 from flask import Flask, request, send_file, render_template, make_response, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail, Message
 from flask_cors import CORS
 
 from googleapiclient.discovery import build
@@ -30,8 +35,14 @@ credentials = service_account.Credentials.from_service_account_info(json.loads(c
 
 app = Flask(__name__, static_url_path = '/static')
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('GMAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('GMAIL_PASSWORD')
 CORS(app)
 db = SQLAlchemy(app)
+mail = Mail(app)
 
 class statusEnum(enum.Enum):
     sent = 1
@@ -56,10 +67,30 @@ class TaskDb(db.Model):
 
 db.create_all()
 
-def getService():
+def getDriveService():
     service = build('drive', 'v3', credentials = credentials)
 
     return service
+
+def getGmailService():
+    service = build('gmail', 'v1', credentials = credentials)
+
+    return service
+
+def sendEmail(pdfRaw):
+    message = Message("Resume",
+            sender="eecsresume@gmail.com",
+            recipients=["gaogaotiantian@hotmail.com"])
+
+    message.body = "resume filed"
+
+    message.attach("resume.pdf", 'application/pdf', pdfRaw)
+
+    try:
+        mail.send(message)
+        print("email sent")
+    except Exception as e:
+        print(e)
 
 chars = string.ascii_uppercase + string.digits
 def getShortLink():
@@ -82,8 +113,6 @@ def task():
         f = request.files.get("resume")
         if f == None:
             return err(400, "Can not find attached file. It should be a pdf file.")
-        fio = io.BytesIO()
-        f.save(fio)
         data = request.json
 
         try:
@@ -92,15 +121,20 @@ def task():
         except:
             return err(400, "Wrong parameters")
 
-        # Google Drive part
-        service = getService()
         shortLink = getShortLink()
-        fileMetadata = {'name': shortLink}
-        media = MediaIoBaseUpload(fio, mimetype='application/pdf')
-        gDriveFile = service.files().create(body = fileMetadata, media_body = media, fields = 'id').execute()
+
+        # Google Drive part
+        #service = getDriveService()
+        #fileMetadata = {'name': shortLink}
+        #media = MediaIoBaseUpload(fio, mimetype='application/pdf')
+        #gDriveFile = service.files().create(body = fileMetadata, media_body = media, fields = 'id').execute()
+
+        # Gmail part
+        sendEmail(f.read())
+
         t = TaskDb()
         t.short_link = shortLink
-        t.file_link = gDriveFile.get('id')
+        #t.file_link = gDriveFile.get('id')
         t.email = email
         t.status = statusEnum.sent
         t.note = note
