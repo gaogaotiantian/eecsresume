@@ -12,10 +12,14 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 
 # other published packages
-from flask import Flask, request, send_file, render_template, make_response, jsonify
+from flask import Flask, request, send_file, render_template, make_response, jsonify, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from flask_cors import CORS
+from flask_admin import Admin
+from flask_admin.contrib import sqla
+from flask_basicauth import BasicAuth
+from werkzeug.exceptions import HTTPException
 
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
@@ -34,14 +38,19 @@ credentials = service_account.Credentials.from_service_account_info(json.loads(c
 
 app = Flask(__name__, static_url_path = '/static')
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+app.config['SECRET_KEY'] = os.urandom(24).hex()
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('GMAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('GMAIL_PASSWORD')
+app.config['BASIC_AUTH_USERNAME'] = os.environ.get("ADMIN_USERNAME")
+app.config['BASIC_AUTH_PASSWORD'] = os.environ.get("ADMIN_PASSWORD")
 CORS(app)
 db = SQLAlchemy(app)
 mail = Mail(app)
+basicAuth = BasicAuth(app)
+admin = Admin(app, name = 'eecsresume', template_mode='bootstrap3')
 
 class statusEnum(enum.Enum):
     sent = 1
@@ -50,6 +59,24 @@ class statusEnum(enum.Enum):
     reviewed = 4
     review_again = 5
     finish = 6
+
+class AuthException(HTTPException):
+    def __init__(self, message):
+        # python 3
+        super().__init__(message, Response(
+            message, 401,
+            {'WWW-Authenticate': 'Basic realm="Login Required"'}
+        ))
+
+class ModelView(sqla.ModelView):
+    def is_accessible(self):
+        if not basicAuth.authenticate():
+            raise AuthException('Not authenticated. Refresh the page.')
+        else:
+            return True
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(basicAuth.challenge())
 
 class TaskDb(db.Model):
     __tablename__ = 'task'
@@ -65,6 +92,8 @@ class TaskDb(db.Model):
     note       = db.Column(db.Text)
 
 db.create_all()
+
+admin.add_view(ModelView(TaskDb, db.session))
 
 def getDriveService():
     service = build('drive', 'v3', credentials = credentials)
