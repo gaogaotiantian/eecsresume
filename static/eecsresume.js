@@ -75,8 +75,5 @@ $(function() {
     // Main page functions end
     
     // Example page functions
-    $('.carousel').carousel({
-        interval: false
-    })
     // Example page functions end
 })
