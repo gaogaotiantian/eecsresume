@@ -9,6 +9,8 @@ $(function() {
         $("#nav-procedure").addClass("active");
     } else if (window.location.href.indexOf("about") != -1) {
         $("#nav-aboutme").addClass("active");
+    } else if (window.location.href.indexOf("example") != -1) {
+        $("#nav-example").addClass("active");
     } else {
         $("#nav-home").addClass("active");
     }
@@ -71,4 +73,10 @@ $(function() {
     })
 
     // Main page functions end
+    
+    // Example page functions
+    $('.carousel').carousel({
+        interval: false
+    })
+    // Example page functions end
 })
