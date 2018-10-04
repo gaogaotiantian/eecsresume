@@ -78,7 +78,7 @@ def getGmailService():
 
 def sendEmail(pdfRaw, email):
     message = Message("Resume review from EECSResume",
-            sender="eecsresume@gmail.com",
+            sender=("EECSResume", "eecsresume@gmail.com"),
             recipients=["eecsresume@gmail.com"])
 
     message.body = "Email: {}\n".format(email)
@@ -95,7 +95,7 @@ def sendConfirmEmail(email):
     print(type(email))
     print(email)
     message = Message("Resume review confirmation from EECSResume",
-            sender="eecsresume@gmail.com",
+            sender=("EECSResume", "eecsresume@gmail.com"),
             recipients=[email])
     message.body = "您好！\n您的Resume我已经收到，我会在数个工作日内给您回复。如果有什么问题，可以直接回复这条消息。\n\n- EECSResume"
 
