@@ -147,6 +147,19 @@ def success(dct):
 def err(err_code, err_msg):
     return make_response(jsonify({"err_msg":err_msg}), err_code)
 
+def getFooter():
+    footer = {}
+    weekTime = datetime.datetime.utcnow() - datetime.timedelta(days = 7)
+    monthTime = datetime.datetime.utcnow() - datetime.timedelta(days = 30)
+    weekReviewCount = TaskDb.query.filter(TaskDb.edit_time > weekTime).filter(TaskDb.status >= statusEnum.browse).count()
+    weekModifyCount = TaskDb.query.filter(TaskDb.edit_time > weekTime).filter(TaskDb.status >= statusEnum.reviewed).count()
+    monthReviewCount = TaskDb.query.filter(TaskDb.edit_time > monthTime).filter(TaskDb.status >= statusEnum.browse).count()
+    monthModifyCount = TaskDb.query.filter(TaskDb.edit_time > monthTime).filter(TaskDb.status >= statusEnum.reviewed).count()
+    latestTime = TaskDb.query.order_by(TaskDb.edit_time.desc()).first().edit_time
+    footer['stat'] = "近一周免费点评简历{}篇，修改简历{}篇。近一月免费点评简历{}篇，修改简历{}篇。".format(weekReviewCount, weekModifyCount, monthReviewCount, monthModifyCount)
+    footer['latest'] = "最近一次活跃于{}, UTC。".format(latestTime.strftime("%x"))
+    return footer
+
 @app.route('/api/v1/task', methods = ['GET', 'POST'])
 def task():
     if request.method == 'POST':
@@ -187,7 +200,7 @@ def task():
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', footer=getFooter())
 
 @app.route('/procedure')
 def procedure():
