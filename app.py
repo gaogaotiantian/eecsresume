@@ -155,7 +155,7 @@ def getFooter():
     weekModifyCount = TaskDb.query.filter(TaskDb.edit_time > weekTime).filter(TaskDb.status >= statusEnum.reviewed).count()
     monthReviewCount = TaskDb.query.filter(TaskDb.edit_time > monthTime).filter(TaskDb.status >= statusEnum.browse).count()
     monthModifyCount = TaskDb.query.filter(TaskDb.edit_time > monthTime).filter(TaskDb.status >= statusEnum.reviewed).count()
-    latestTime = TaskDb.query.order_by(TaskDb.edit_time.desc()).first().edit_time
+    latestTime = TaskDb.query.filter(TaskDb.edit_time.isnot(None)).order_by(TaskDb.edit_time.desc()).first().edit_time
     footer['stat'] = "近一周免费点评简历{}篇，修改简历{}篇。近一月免费点评简历{}篇，修改简历{}篇。".format(weekReviewCount, weekModifyCount, monthReviewCount, monthModifyCount)
     footer['latest'] = "最近一次活跃于{}, UTC。".format(latestTime.strftime("%x"))
     return footer
