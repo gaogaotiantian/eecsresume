@@ -69,6 +69,10 @@ class AuthException(HTTPException):
         ))
 
 class ModelView(sqla.ModelView):
+    column_default_sort = ('add_time', True)
+    column_filters = ('status',)
+    column_searchable_list = ('email',)
+
     def is_accessible(self):
         if not basicAuth.authenticate():
             raise AuthException('Not authenticated. Refresh the page.')
