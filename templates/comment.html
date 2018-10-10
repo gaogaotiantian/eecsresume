@@ -1,0 +1,89 @@
+<html>
+{% include 'header.html' %}
+<script src="/static/comment.js" type="text/javascript"></script>
+<body class="text-center">
+  <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+    {% include 'navbar.html' %}
+    <div class="inner">
+      <div id="comment-submit-div" class="my-1 row">
+        <div class="col-8 text-left" style="font-size:1.1rem">
+          <span>平均评分 </span><span id="average-score"></span><span> / 10</span>
+        </div>
+        <div class="col-4 text-right ">
+          <button class="btn btn-primary" id="comment-submit-modal" data-toggle="modal" data-target="#comment-modal">写评价</button>
+        </div>
+      </div>
+    </div>
+    <main role="main" class="inner cover mb-auto">
+      <div id="main-content">
+        <div id="card-tmpl" class="card d-none my-1">
+          <div class="card-header">
+            <span class="card-email">email</span>
+            <span class="card-usertype">点评用户</span>
+            <span class="card-time">2018/08/10</span>
+          </div>
+          <div class="card-body">
+            <h5 class="card-score">9.8 / 10</h5>
+            <p class="card-comment">test</p>
+          </div>
+        </div>
+        <div id="comment-display">
+          <div id="comment-body">
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <div id="comment-page" class="py-2">
+        <nav aria-label="Page navigation example">
+          <ul class="pagination justify-content-center">
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">4</a></li>
+            <li class="page-item"><a class="page-link" href="#">5</a></li>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="comment-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalCenterTitle">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="email-input">Email Address</label>
+              <input type="email" class="form-control" id="email-input" placeholder="Enter Email">
+              <small class="form-text text-muted">您的Email不会被完全显示在评论中，输入Email是为了确认您使用过我们的服务。如果您有顾虑，可以使用匿名评论，但匿名评论的评分不会被计入总分。</small>
+              <input type="checkbox" class="form-check-input" id="email-checkbox">
+              <label class="form-check-label" for="email-checkbox">匿名提交</label>
+            </div>
+            <div class="form-group">
+              <label>评分：<span id="grade-value">10</span> / 10</label>
+              <input type="range" min="0" max="1000" value="1000" class="slider" id="grade-slider">
+            </div>
+            <div class="form-group">
+              <label for="comment-textarea">评价</label>
+              <textarea class="form-control" id="comment-textarea" rows="5"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+          <button type="button" class="btn btn-primary" id="comment-submit">提交</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

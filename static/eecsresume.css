@@ -91,6 +91,7 @@ body {
  */
 .cover {
   padding: 0 1.5rem;
+  overflow-y: auto;
 }
 .cover .btn-lg {
   padding: .75rem 1.25rem;
@@ -120,4 +121,60 @@ body {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* The slider itself */
+.slider {
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    width: 100%; /* Full-width */
+    height: 15px; /* Specified height */
+    border-radius: 5px;
+    background: #bbb; /* Grey background */
+    outline: none; /* Remove outline */
+    opacity: 1; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%; 
+    background: #007BFF;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #007BFF;
+    cursor: pointer;
+}
+
+.card {
+    color: #333;
+    text-shadow: initial;
+    text-align: left;
+}
+
+.modal-content {
+    text-shadow: initial;
+    color: #333;
+}
+
+.card-usertype, .card-time {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.card-score {
+    color: #888;
+}
+
+.card-comment {
+    white-space: pre-wrap;
 }

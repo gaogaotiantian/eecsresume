@@ -1,4 +1,5 @@
 #coding=utf-8
+import math
 import os
 import string
 import enum
@@ -59,6 +60,15 @@ class statusEnum(enum.Enum):
     reviewed = 4
     review_again = 5
     finish = 6
+    def __lt__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value < other.value
+        return NotImplemented
+
+class commentTypeEnum(enum.Enum):
+    anonymous = 1
+    browse = 2
+    review = 3
 
 class AuthException(HTTPException):
     def __init__(self, message):
@@ -69,10 +79,6 @@ class AuthException(HTTPException):
         ))
 
 class ModelView(sqla.ModelView):
-    column_default_sort = ('add_time', True)
-    column_filters = ('status',)
-    column_searchable_list = ('email',)
-
     def is_accessible(self):
         if not basicAuth.authenticate():
             raise AuthException('Not authenticated. Refresh the page.')
@@ -81,6 +87,11 @@ class ModelView(sqla.ModelView):
 
     def inaccessible_callback(self, name, **kwargs):
         return redirect(basicAuth.challenge())
+
+class TaskModelView(ModelView):
+    column_default_sort = ('add_time', True)
+    column_filters = ('status',)
+    column_searchable_list = ('email',)
 
 class TaskDb(db.Model):
     __tablename__ = 'task'
@@ -95,9 +106,31 @@ class TaskDb(db.Model):
     review     = db.Column(db.Text)
     note       = db.Column(db.Text)
 
+class CommentDb(db.Model):
+    __tablename__ = 'comment'
+    id         = db.Column(db.Integer, primary_key = True)
+    email      = db.Column(db.String(128))
+    comment    = db.Column(db.Text)
+    score      = db.Column(db.Float)
+    type       = db.Column(db.Enum(commentTypeEnum))
+    edit_time  = db.Column(db.DateTime, server_default = db.func.now(), onupdate = db.func.now())
+
+    def toDict(self):
+        try:
+            if self.email == "anonymous":
+                email = "anonymous"
+            else:
+                lst = self.email.split('@')
+                lst[0] = lst[0][0] +'*'*(len(lst[0])-2) + lst[0][-1]
+                email = '@'.join(lst)
+            return {"email":email, "type":self.type.name, 'comment':self.comment, 'edit_time': self.edit_time, 'score':self.score}
+        except:
+            return None
+
 db.create_all()
 
-admin.add_view(ModelView(TaskDb, db.session))
+admin.add_view(TaskModelView(TaskDb, db.session))
+admin.add_view(ModelView(CommentDb, db.session))
 
 def getDriveService():
     service = build('drive', 'v3', credentials = credentials)
@@ -145,6 +178,7 @@ def getShortLink():
         check = TaskDb.query.filter_by(short_link = s).first()
         if check == None:
             return s
+
 def success(dct):
     return make_response(jsonify(dct), 200)
 
@@ -163,6 +197,10 @@ def getFooter():
     footer['stat'] = "近一周免费点评简历{}篇，修改简历{}篇。近一月免费点评简历{}篇，修改简历{}篇。".format(weekReviewCount, weekModifyCount, monthReviewCount, monthModifyCount)
     footer['latest'] = "最近一次活跃于{}, UTC。".format(latestTime.strftime("%x"))
     return footer
+
+def getAvrScore():
+    score = CommentDb.query.with_entities(db.func.avg(CommentDb.score).label('average')).filter(CommentDb.type != commentTypeEnum.anonymous).first()[0]
+    return score
 
 @app.route('/api/v1/task', methods = ['GET', 'POST'])
 def task():
@@ -201,6 +239,66 @@ def task():
         db.session.commit()
     return success({"msg":"success"})
 
+@app.route('/api/v1/comment', methods = ['GET', 'POST'])
+def comment():
+    if request.method == 'POST':
+        data = request.json
+        if data == None:
+            return err(400, "No json data")
+        try:
+            email  = data['email']
+            comment = data['comment']
+            score   = data['score']
+        except:
+            return err(400, "Wrong parameters")
+
+        if email != "anonymous":
+            t = TaskDb.query.filter_by(email = email).order_by(TaskDb.status.desc()).first()
+
+            if t == None or t.status < statusEnum.browse:
+                return err(403, "No such email")
+
+        c = CommentDb.query.filter_by(email = email).first()
+        if c == None or email == "anonymous":
+            newc = CommentDb()
+            newc.email = email
+            newc.comment = comment
+            newc.score = score
+
+            if email == "anonymous":
+                newc.type = commentTypeEnum.anonymous
+            elif t.status < statusEnum.reviewed:
+                newc.type = commentTypeEnum.browse
+            else:
+                newc.type = commentTypeEnum.review
+            db.session.add(newc)
+            db.session.commit()
+        else:
+            c.comment = comment
+            c.score = score
+            if t.status < statusEnum.reviewed:
+                c.type = commentTypeEnum.browse
+            else:
+                c.type = commentTypeEnum.review
+            db.session.commit(c)
+        return success({"msg":"success"})
+    elif request.method == 'GET':
+        page = request.args.get("page")
+        if page == None:
+            page = 1
+        else:
+            try:
+                page = int(page)
+            except:
+                return err(400, "Wrong page argument")
+        total = CommentDb.query.count()
+        resultsPerPage = 10
+        results = CommentDb.query.order_by(CommentDb.edit_time.desc()).limit(resultsPerPage).offset((page-1)*resultsPerPage)
+
+        return success({"results":[r.toDict() for r in results if r.toDict()], "totalPage":math.ceil(total/resultsPerPage), "avrScore":getAvrScore()})
+        
+
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -221,6 +319,10 @@ def example():
 @app.route('/submit')
 def submit():
     return render_template('submit.html')
+
+@app.route('/comment')
+def route_comment():
+    return render_template('comment.html')
 
 if __name__ == '__main__':
     app.run(debug = True)
