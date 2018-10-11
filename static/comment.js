@@ -78,7 +78,12 @@ submitComment = function() {
             window.location.replace('./comment');
         },
         error: function(d, st, xhr) {
-            alert("服务器出现错误！请稍后再试！");
+            var text = JSON.parse(d.responseText);
+            if (text && text['err_msg']) {
+                alert(text['err_msg']);
+            } else {
+                alert("服务器出现错误！请稍后再试！");
+            }
         }
     })
 }

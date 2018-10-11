@@ -256,7 +256,7 @@ def comment():
             t = TaskDb.query.filter_by(email = email).order_by(TaskDb.status.desc()).first()
 
             if t == None or t.status < statusEnum.browse:
-                return err(403, "No such email")
+                return err(403, "这个Email没有使用过EECSResume的服务")
 
         c = CommentDb.query.filter_by(email = email).first()
         if c == None or email == "anonymous":
