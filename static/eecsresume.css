@@ -188,3 +188,9 @@ body {
     font-size: 1.2rem;
     color: #ddd;
 }
+
+.article-content em {
+    text-decoration: underline;
+    font-style: unset;
+    font-weight:bold;
+}
