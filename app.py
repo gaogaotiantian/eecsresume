@@ -95,6 +95,9 @@ class TaskModelView(ModelView):
     column_filters = ('status',)
     column_searchable_list = ('email',)
 
+class ArticleModelView(ModelView):
+    column_formatters = dict(content=lambda v,c,m,p: m.content[:100] + '...')
+
 class TaskDb(db.Model):
     __tablename__ = 'task'
     id         = db.Column(db.Integer, primary_key = True)
@@ -147,7 +150,7 @@ db.create_all()
 
 admin.add_view(TaskModelView(TaskDb, db.session))
 admin.add_view(ModelView(CommentDb, db.session))
-admin.add_view(ModelView(ArticleDb, db.session))
+admin.add_view(ArticleModelView(ArticleDb, db.session))
 
 def getDriveService():
     service = build('drive', 'v3', credentials = credentials)
