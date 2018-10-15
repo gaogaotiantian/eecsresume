@@ -13,7 +13,7 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 
 # other published packages
-from flask import Flask, request, send_file, render_template, make_response, jsonify, Response, Markup
+from flask import Flask, request, send_file, render_template, make_response, jsonify, Response, Markup, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from flask_cors import CORS
@@ -315,6 +315,10 @@ def comment():
         return success({"results":[r.toDict() for r in results if r.toDict()], "totalPage":math.ceil(total/resultsPerPage), "avrScore":getAvrScore()})
         
 
+
+@app.route('/sitemap.xml')
+def sitemap():
+    return send_from_directory(app.static_folder, request.path[1:])
 
 @app.route('/')
 @app.route('/index')
