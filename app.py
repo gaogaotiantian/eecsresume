@@ -13,7 +13,7 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 
 # other published packages
-from flask import Flask, request, send_file, render_template, make_response, jsonify, Response
+from flask import Flask, request, send_file, render_template, make_response, jsonify, Response, Markup
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from flask_cors import CORS
@@ -28,6 +28,8 @@ from httplib2 import Http
 from oauth2client.client import OAuth2WebServerFlow
 from oauth2client import file, client, tools
 from google.oauth2 import service_account
+
+import markdown
 
 DATABASE_URL = None
 if os.environ.get('DATABASE_URL') != None:
@@ -127,10 +129,25 @@ class CommentDb(db.Model):
         except:
             return None
 
+class ArticleDb(db.Model):
+    __tablename__ = 'article'
+    id            = db.Column(db.Integer, primary_key = True)
+    link          = db.Column(db.String(128))
+    title         = db.Column(db.String(256))
+    content       = db.Column(db.Text)
+    priority      = db.Column(db.Integer, server_default = "1")
+    edit_time     = db.Column(db.DateTime, server_default = db.func.now(), onupdate = db.func.now())
+
+    def toBrowse(self):
+        return {"link":self.link, "title":self.title}
+    def toContent(self):
+        return {"link":self.link, "title":self.title, "content":Markup(markdown.markdown(self.content))}
+
 db.create_all()
 
 admin.add_view(TaskModelView(TaskDb, db.session))
 admin.add_view(ModelView(CommentDb, db.session))
+admin.add_view(ModelView(ArticleDb, db.session))
 
 def getDriveService():
     service = build('drive', 'v3', credentials = credentials)
@@ -323,6 +340,24 @@ def submit():
 @app.route('/comment')
 def route_comment():
     return render_template('comment.html')
+
+@app.route('/article/<link>')
+def articleContent(link):
+    articleRaw = ArticleDb.query.filter_by(link = link).first()
+    if articleRaw == None:
+        title = "没有这篇文章。"
+        content = ""
+    else:
+        article = articleRaw.toContent()
+        title = article["title"]
+        content = article["content"]
+    return render_template('articleContent.html', title=title, content=content)
+
+@app.route('/article')
+def article():
+    articlesRaw = ArticleDb.query.order_by(ArticleDb.priority, ArticleDb.edit_time.desc()).all()
+    articles = [a.toBrowse() for a in articlesRaw]
+    return render_template('article.html', articles = articles)
 
 if __name__ == '__main__':
     app.run(debug = True)

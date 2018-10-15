@@ -178,3 +178,13 @@ body {
 .card-comment {
     white-space: pre-wrap;
 }
+
+.list-article {
+    font-size: 1.1rem;
+    background-color: #444;
+}
+
+.article-content {
+    font-size: 1.2rem;
+    color: #ddd;
+}

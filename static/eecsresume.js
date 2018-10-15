@@ -13,6 +13,8 @@ $(function() {
         $("#nav-example").addClass("active");
     } else if (window.location.href.indexOf("comment") != -1) {
         $("#nav-comment").addClass("active");
+    } else if (window.location.href.indexOf("article") != -1) {
+        $("#nav-article").addClass("active");
     } else {
         $("#nav-home").addClass("active");
     }
