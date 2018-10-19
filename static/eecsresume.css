@@ -76,6 +76,10 @@ body {
   border-bottom-color: #000;
 }
 
+h1,h2,h3,h4,h5,.lead {
+    font-weight:700;
+}
+
 @media (min-width: 48em) {
   .masthead-brand {
     float: left;
