@@ -1,0 +1,28 @@
+<html>
+{% include 'header.html' %}
+<body>
+  <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+    {% include 'navbar_nospace.html' %}
+    <main role="main" class="inner mt-4">
+      <table class="table">
+        <thead>
+          <th scope="col">#</th>
+          <th scope="col">User</th>
+          <th scope="col">Score</th>
+          <th scope="col">Result</th>
+        </thead>
+        <tbody>
+          {% for s in data %}
+          <tr>
+            <th scope="row">{{loop.index}}</th>
+            <td>{{s.user}}</td>
+            <td>{{s.score}}</td>
+            <td>{{s.results}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </main>
+  </div>
+</body>
+</html>

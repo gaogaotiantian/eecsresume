@@ -31,6 +31,9 @@ from google.oauth2 import service_account
 
 import markdown
 
+# My modules
+from challenge import Challenge
+
 DATABASE_URL = None
 if os.environ.get('DATABASE_URL') != None:
     DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -98,6 +101,12 @@ class TaskModelView(ModelView):
 class ArticleModelView(ModelView):
     column_formatters = dict(content=lambda v,c,m,p: m.content[:100] + '...')
 
+class ChallengeModelView(ModelView):
+    column_formatters = dict(description=lambda v,c,m,p: m.description[:100] + '...')
+
+class SolutionModelView(ModelView):
+    column_formatters = dict(answer=lambda v,c,m,p: m.answer[:100] + '...')
+
 class TaskDb(db.Model):
     __tablename__ = 'task'
     id         = db.Column(db.Integer, primary_key = True)
@@ -146,11 +155,43 @@ class ArticleDb(db.Model):
     def toContent(self):
         return {"link":self.link, "title":self.title, "content":Markup(markdown.markdown(self.content))}
 
+class ProblemDb(db.Model):
+    __tablename__ = 'problem'
+    id            = db.Column(db.Integer, primary_key = True)
+    link          = db.Column(db.String(128))
+    title         = db.Column(db.String(256))
+    priority      = db.Column(db.Integer, server_default = "1")
+    version       = db.Column(db.Integer, server_default = "1")
+    description   = db.Column(db.Text)
+    questions     = db.Column(db.Text)
+
+    def toBrowse(self):
+        return {"link":self.link, "title":self.title}
+    def toContent(self):
+        return {"id": self.id, "link":self.link, "title":self.title, "description":Markup(markdown.markdown(self.description, extensions=["fenced_code"]))}
+
+class SolutionDb(db.Model):
+    __tablename__ = 'solution'
+    id            = db.Column(db.Integer, primary_key = True)
+    ques_id       = db.Column(db.Integer)
+    ques_title    = db.Column(db.String(256))
+    user          = db.Column(db.String(128))
+    answers       = db.Column(db.Text)
+    version       = db.Column(db.Integer, server_default = "1")
+    score         = db.Column(db.Float, server_default = "1")
+    results       = db.Column(db.Text)
+    edit_time     = db.Column(db.DateTime, server_default = db.func.now(), onupdate = db.func.now())
+
+    def toDict(self):
+        return {"user":self.user, "score":self.score, "results":self.results}
+
 db.create_all()
 
 admin.add_view(TaskModelView(TaskDb, db.session))
 admin.add_view(ModelView(CommentDb, db.session))
 admin.add_view(ArticleModelView(ArticleDb, db.session))
+admin.add_view(ChallengeModelView(ProblemDb, db.session))
+admin.add_view(SolutionModelView(SolutionDb, db.session))
 
 def getDriveService():
     service = build('drive', 'v3', credentials = credentials)
@@ -317,6 +358,61 @@ def comment():
 
         return success({"results":[r.toDict() for r in results if r.toDict()], "totalPage":math.ceil(total/resultsPerPage), "avrScore":getAvrScore()})
         
+@app.route('/api/v1/challenge/answer/<link>', methods=['POST'])
+def challengeAnswer(link):
+    challenge = ProblemDb.query.filter_by(link = link).first()
+    if challenge == None:
+        return err(400, "Wrong questions")
+    data = request.json
+    if data == None:
+        return err(400, "No json data")
+    try:
+        user = data['user']
+        answers = data['answer']
+    except:
+        return err(400, "Wrong parameters")
+
+    if len(answers) > 1000000:
+        return err(400, "Answer is too long")
+
+    questions = challenge.questions
+
+    try:
+        c = Challenge()
+        score, results, err_msg = c.evaluate(link, questions, answers)
+        if score == None:
+            return err(400, err_msg)
+    except Exception as e:
+        print (e)
+        return err(400, "Something is wrong but I don't know why")
+
+    s = SolutionDb.query.filter_by(user = user, ques_id = challenge.id, version = challenge.version).first()
+    if s == None:
+        s = SolutionDb()
+    elif s.score > score:
+        return success({"msg":"success", "score":score})
+
+    s.ques_id = challenge.id
+    s.ques_title = challenge.title
+    s.user = user
+    s.answers = answers
+    s.version = challenge.version
+    s.score = score
+    s.results = results
+    db.session.add(s)
+    db.session.commit()
+    
+    return success({"msg":"success", "score":score})
+
+@app.route('/api/v1/challenge/result/<link>')
+def challengeResult(link):
+    challenge = ProblemDb.query.filter_by(link = link).first()
+    if challenge == None:
+        return err(400, "Wrong questions")
+    
+    solutions = SolutionDb.query.filter_by(ques_id = challenge.id, version = challenge.version).order_by(SolutionDb.score).limit(20).all()
+
+    return success({"msg":"success", "data":[s.toDict() for s in solutions]})
 
 
 @app.route('/sitemap.xml')
@@ -347,6 +443,40 @@ def submit():
 @app.route('/comment')
 def route_comment():
     return render_template('comment.html')
+
+@app.route('/challenge')
+def route_challenge():
+    challengesRaw = ProblemDb.query.order_by(ProblemDb.priority).all()
+    challenges = [c.toBrowse() for c in challengesRaw]
+    return render_template('challenge.html', challenges = challenges)
+
+@app.route('/challenge/<link>')
+def challengeContent(link):
+    challengeRaw = ProblemDb.query.filter_by(link = link).first()
+    if challengeRaw == None:
+        return "不许瞎跑，哪儿有这个链接"
+    challenge = challengeRaw.toContent()
+    title = challenge['title']
+    description = challenge['description']
+
+    return render_template("challengeContent.html", title = title, description = description, ques_link = link)
+
+@app.route('/challenge/<link>/question')
+def challengeQuestion(link):
+    challengeRaw = ProblemDb.query.filter_by(link = link).first()
+    if challengeRaw == None:
+        return "不许瞎跑，哪儿有这个链接"
+    else:
+        return challengeRaw.questions
+
+@app.route('/challenge/<link>/rank')
+def challengeRank(link):
+    challenge = ProblemDb.query.filter_by(link = link).first()
+    if challenge == None:
+        return "不许瞎跑，哪儿有这个链接"
+    else:
+        solutions = SolutionDb.query.filter_by(ques_id = challenge.id, version = challenge.version).order_by(SolutionDb.score).limit(20).all()
+        return render_template("challengeRank.html", data = [s.toDict() for s in solutions])
 
 @app.route('/article/<link>')
 def articleContent(link):
