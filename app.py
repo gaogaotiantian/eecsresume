@@ -8,6 +8,7 @@ import datetime
 import io
 import json
 import base64
+import re
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
@@ -102,7 +103,7 @@ class ArticleModelView(ModelView):
     column_formatters = dict(content=lambda v,c,m,p: m.content[:100] + '...')
 
 class ChallengeModelView(ModelView):
-    column_formatters = dict(description=lambda v,c,m,p: m.description[:100] + '...')
+    column_formatters = dict(description=lambda v,c,m,p: m.description[:100] + '...', questions=lambda v,c,m,p: m.questions[:40] + '...')
 
 class SolutionModelView(ModelView):
     column_formatters = dict(answer=lambda v,c,m,p: m.answer[:100] + '...')
@@ -410,7 +411,11 @@ def challengeResult(link):
     if challenge == None:
         return err(400, "Wrong questions")
     
-    solutions = SolutionDb.query.filter_by(ques_id = challenge.id, version = challenge.version).order_by(SolutionDb.score).limit(20).all()
+    solutions = SolutionDb.query.filter_by(ques_id = challenge.id, version = challenge.version).order_by(SolutionDb.score).limit(50).all()
+
+    if link == "black_and_white":
+        print("test")
+        solutions.sort(key = lambda x: (-x.score, float(re.search("(.*?)",x.result.split('|')[-1]).groups()[0])))
 
     return success({"msg":"success", "data":[s.toDict() for s in solutions]})
 
@@ -445,12 +450,14 @@ def route_comment():
     return render_template('comment.html')
 
 @app.route('/challenge')
+@app.route('/challenge/')
 def route_challenge():
     challengesRaw = ProblemDb.query.order_by(ProblemDb.priority).all()
     challenges = [c.toBrowse() for c in challengesRaw]
     return render_template('challenge.html', challenges = challenges)
 
 @app.route('/challenge/<link>')
+@app.route('/challenge/<link>/')
 def challengeContent(link):
     challengeRaw = ProblemDb.query.filter_by(link = link).first()
     if challengeRaw == None:
@@ -475,7 +482,10 @@ def challengeRank(link):
     if challenge == None:
         return "不许瞎跑，哪儿有这个链接"
     else:
-        solutions = SolutionDb.query.filter_by(ques_id = challenge.id, version = challenge.version).order_by(SolutionDb.score).limit(20).all()
+        solutions = SolutionDb.query.filter_by(ques_id = challenge.id, version = challenge.version).order_by(SolutionDb.score).limit(50).all()
+        if link == "black_and_white":
+            solutions.sort(key = lambda x: (-x.score, float(re.search("\((.*?)\)",x.results.split('|')[-1]).groups()[0])))
+
         return render_template("challengeRank.html", data = [s.toDict() for s in solutions])
 
 @app.route('/article/<link>')

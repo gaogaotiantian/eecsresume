@@ -38,8 +38,9 @@ class BlackWhite():
                 ret_score += score
                 final_moves += moves
                 ret_results.append("{}({})".format(score,moves))
+        ret_results.append("{}({})".format(ret_score,final_moves))
 
-        return ret_score, "|".join(ret_results), None
+        return ret_score, " | ".join(ret_results), None
 
     def load_string(self, s):
         lst = s.split(",")
