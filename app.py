@@ -183,7 +183,9 @@ class SolutionDb(db.Model):
     results       = db.Column(db.Text)
     edit_time     = db.Column(db.DateTime, server_default = db.func.now(), onupdate = db.func.now())
 
-    def toDict(self):
+    def toDict(self, link):
+        if link == 'black_and_white':
+            return {"user":self.user, "score":int(self.score), "results":self.results}
         return {"user":self.user, "score":self.score, "results":self.results}
 
 db.create_all()
@@ -405,21 +407,6 @@ def challengeAnswer(link):
     
     return success({"msg":"success", "score":score})
 
-@app.route('/api/v1/challenge/result/<link>')
-def challengeResult(link):
-    challenge = ProblemDb.query.filter_by(link = link).first()
-    if challenge == None:
-        return err(400, "Wrong questions")
-    
-    solutions = SolutionDb.query.filter_by(ques_id = challenge.id, version = challenge.version).order_by(SolutionDb.score).limit(50).all()
-
-    if link == "black_and_white":
-        print("test")
-        solutions.sort(key = lambda x: (-x.score, float(re.search("(.*?)",x.result.split('|')[-1]).groups()[0])))
-
-    return success({"msg":"success", "data":[s.toDict() for s in solutions]})
-
-
 @app.route('/sitemap.xml')
 def sitemap():
     return send_from_directory(app.static_folder, request.path[1:])
@@ -486,7 +473,7 @@ def challengeRank(link):
         if link == "black_and_white":
             solutions.sort(key = lambda x: (-x.score, float(re.search("\((.*?)\)",x.results.split('|')[-1]).groups()[0])))
 
-        return render_template("challengeRank.html", data = [s.toDict() for s in solutions])
+        return render_template("challengeRank.html", data = [s.toDict(link) for s in solutions])
 
 @app.route('/article/<link>')
 def articleContent(link):
