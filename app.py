@@ -106,7 +106,7 @@ class ChallengeModelView(ModelView):
     column_formatters = dict(description=lambda v,c,m,p: m.description[:100] + '...', questions=lambda v,c,m,p: m.questions[:40] + '...')
 
 class SolutionModelView(ModelView):
-    column_formatters = dict(answer=lambda v,c,m,p: m.answer[:100] + '...')
+    column_formatters = dict(answer=lambda v,c,m,p: m.answer[:30] + '...')
 
 class TaskDb(db.Model):
     __tablename__ = 'task'
@@ -455,13 +455,13 @@ def challengeContent(link):
 
     return render_template("challengeContent.html", title = title, description = description, ques_link = link)
 
-@app.route('/challenge/<link>/question')
+@app.route('/challenge/<link>/question.txt')
 def challengeQuestion(link):
     challengeRaw = ProblemDb.query.filter_by(link = link).first()
     if challengeRaw == None:
         return "不许瞎跑，哪儿有这个链接"
     else:
-        return challengeRaw.questions
+        return Response(challengeRaw.questions, mimetype='text/csv')
 
 @app.route('/challenge/<link>/rank')
 def challengeRank(link):

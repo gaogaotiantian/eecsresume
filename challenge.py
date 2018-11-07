@@ -11,7 +11,9 @@ class BlackWhite():
 
         # questions is expected to be separated by | 
         # each row in the grid is separated by ,
-        # a valid question could be: 111,000,111|000,101,010
+        # a valid question could be: 
+        # 111,000,111
+        # 000,101,010
 
         # answers is expected to be separated by |
         # a valid answer could be: rrdd|ddrr
@@ -20,14 +22,14 @@ class BlackWhite():
         final_moves = 0
         ret_results = []
         # strip all the spaces first
-        questions = questions.replace(" ","").split("|")
-        answers   = answers.replace(" ","").split("|")
+        questions = questions.replace(" ","").replace("\r","").split("=")
+        answers   = answers.replace(" ","").replace("\r","").split("\n")
 
         if len(questions) != len(answers):
             return None, None, "Answer number is incorrect. Expected {} answer, got {}".format(len(questions), len(answers))
 
         for i in range(len(questions)):
-            question = questions[i]
+            question = questions[i].strip()
             answer = answers[i]
             if not self.load_string(question):
                 return None, None, "Question is not formatted well"
@@ -43,7 +45,7 @@ class BlackWhite():
         return ret_score, " | ".join(ret_results), None
 
     def load_string(self, s):
-        lst = s.split(",")
+        lst = s.split("\n")
         self.height = len(lst)
         self.width = len(lst[0])
         self.grid = []
@@ -52,12 +54,14 @@ class BlackWhite():
                 self.valid = False
                 return False
             new = []
-            for c in row:
+            for c in row.strip():
                 if c == '0':
                     new.append(0)
                 elif c == '1':
                     new.append(1)
                 else:
+                    print("error")
+                    print(c)
                     self.valid = False
                     return False
             self.grid.append(new)
@@ -90,7 +94,7 @@ class BlackWhite():
                 tempGrid[curry][currx] = 1 - tempGrid[curry][currx]
             else:
                 return None, None, None, "Move out of grid, {}".format(currMove)
-        return self.count(tempGrid), tempGrid, currMove, None
+        return self.count(tempGrid) - self.count(self.grid), tempGrid, currMove, None
 
     def count(self, grid):
         return sum(lst.count(1) for lst in grid)
@@ -120,4 +124,4 @@ class Challenge():
 
 if __name__ == '__main__':
     c = Challenge()
-    print(c.evaluate("black_and_white", "111,000,111|000,101,001","rrdd|ddrr"))
+    print(c.evaluate("black_and_white", "111\n000\n111\n=\n000\n101\n001\n","rrdd\nddrr"))
