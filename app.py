@@ -439,7 +439,7 @@ def route_comment():
 @app.route('/challenge')
 @app.route('/challenge/')
 def route_challenge():
-    challengesRaw = ProblemDb.query.order_by(ProblemDb.priority).all()
+    challengesRaw = ProblemDb.query.filter(ProblemDb.version > 0).order_by(ProblemDb.priority).all()
     challenges = [c.toBrowse() for c in challengesRaw]
     return render_template('challenge.html', challenges = challenges)
 
