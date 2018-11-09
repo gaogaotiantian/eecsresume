@@ -15,13 +15,14 @@ $(function() {
         $("#nav-comment").addClass("active");
     } else if (window.location.href.indexOf("article") != -1) {
         $("#nav-article").addClass("active");
+    } else if (window.location.href.indexOf("maze") != -1) {
+        $("#nav-maze").addClass("active");
     } else {
         $("#nav-home").addClass("active");
     }
     // Nav bar functions end
     // Main page functions
     $("#upload-file-button").click(function() {
-        console.log("click")
     })  
 
     $("#user-email").change(function() {
