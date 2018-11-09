@@ -34,6 +34,7 @@ import markdown
 
 # My modules
 from challenge import Challenge
+from curse import randomCurse
 
 DATABASE_URL = None
 if os.environ.get('DATABASE_URL') != None:
@@ -410,7 +411,7 @@ def mazeAnswer():
         m.visit_fourth += 1
         m.success += 1
     else:
-        return err(400, "答错了，你是猪么？")
+        return err(400, randomCurse())
     db.session.commit()
 
     n = MazeDb.query.filter_by(title = answer).first()

@@ -6,7 +6,7 @@ showMaze = function(d) {
 
     $("#maze-title").text(d['data']['title']);
     $("#maze-question").text(d['data']['question']);
-    $("#maze-stat").text('到达本关者' + d['data']['visit'].toString() + '位勇士，过关者' + d['data']['success'].toSring() + '人')
+    $("#maze-stat").text('到达本关者' + d['data']['visit'].toString() + '位勇士，过关者' + d['data']['success'].toString() + '人')
 }
 mazeJump = function() {
     var title = $("#maze-jump-input").val();
