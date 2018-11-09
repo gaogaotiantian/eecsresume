@@ -1,3 +1,4 @@
+# Black and White
 class BlackWhite():
     def __init__(self):
         self.grid = []
@@ -9,14 +10,21 @@ class BlackWhite():
         # If score is None, then err_msg is guaranteed to be a string
         # explaining about what happened
 
-        # questions is expected to be separated by | 
-        # each row in the grid is separated by ,
+        # questions is expected to be separated by \n=\n
+        # each row in the grid is separated by \n
         # a valid question could be: 
-        # 111,000,111
-        # 000,101,010
+        # 111
+        # 000
+        # 111
+        # =
+        # 000
+        # 101
+        # 010
 
-        # answers is expected to be separated by |
-        # a valid answer could be: rrdd|ddrr
+        # answers is expected to be separated by \n
+        # a valid answer could be: 
+        # rrdd
+        # ddrr
 
         ret_score = 0
         final_moves = 0
@@ -108,6 +116,34 @@ class BlackWhite():
 
     def print(self, grid = None):
         print(self.print_string(grid))
+
+class MountainOcean:
+    def __init__(self):
+        self.grid = []
+        self.valid = False
+        self.width = 0
+        self.height = 0
+    def evaluate(self, questions, answers):
+        pass
+        # This will return a tuple (score, results, err_msg)
+        # If score is None, then err_msg is guaranteed to be a string
+        # explaining about what happened
+
+        # questions is expected to be separated by \n=\n
+        # each row in the grid is separated by \n
+        # a valid question could be: 
+        # bbc
+        # bba
+        # abb
+        # =
+        # dcc
+        # bae
+        # cdb
+
+        # answers is expected to be separated by \n
+        # a valid answer could be: 
+        # rrld
+        # ddrr
 
 class Challenge():
     def __init__(self):

@@ -188,6 +188,26 @@ class SolutionDb(db.Model):
             return {"user":self.user, "score":int(self.score), "results":self.results}
         return {"user":self.user, "score":self.score, "results":self.results}
 
+class MazeDb(db.Model):
+    __tablename__ = 'maze'
+    id            = db.Column(db.Integer, primary_key = True)
+    title         = db.Column(db.String(256))
+    question      = db.Column(db.Text)
+    visit         = db.Column(db.Integer, server_default = "0")
+    success       = db.Column(db.Integer, server_default = "0")
+    path_first    = db.Column(db.String(256))
+    visit_first   = db.Column(db.Integer, server_default = "0")
+    path_second   = db.Column(db.String(256))
+    visit_second  = db.Column(db.Integer, server_default = "0")
+    path_third    = db.Column(db.String(256))
+    visit_third   = db.Column(db.Integer, server_default = "0")
+    path_fourth   = db.Column(db.String(256))
+    visit_fourth  = db.Column(db.Integer, server_default = "0")
+
+    def toDict(self):
+        return {"title":self.title, "question":self.question,
+                "visit":self.visit, "success":self.success}
+
 db.create_all()
 
 admin.add_view(TaskModelView(TaskDb, db.session))
@@ -195,6 +215,7 @@ admin.add_view(ModelView(CommentDb, db.session))
 admin.add_view(ArticleModelView(ArticleDb, db.session))
 admin.add_view(ChallengeModelView(ProblemDb, db.session))
 admin.add_view(SolutionModelView(SolutionDb, db.session))
+admin.add_view(ModelView(MazeDb, db.session))
 
 def getDriveService():
     service = build('drive', 'v3', credentials = credentials)
@@ -360,6 +381,60 @@ def comment():
         results = CommentDb.query.order_by(CommentDb.edit_time.desc()).limit(resultsPerPage).offset((page-1)*resultsPerPage)
 
         return success({"results":[r.toDict() for r in results if r.toDict()], "totalPage":math.ceil(total/resultsPerPage), "avrScore":getAvrScore()})
+
+@app.route('/api/v1/maze/answer', methods=['POST'])
+def mazeAnswer():
+    data = request.json
+    if data == None:
+        return err(400, "No json data")
+    try:
+        title  = data['title']
+        answer = data['answer'].lower()
+    except:
+        return err(400, "Wrong parameters")
+    if len(answer) == 0:
+        return err(400, "Empty answer")
+    m = MazeDb.query.filter_by(title = title).first()
+    if m == None:
+        return err(400, "Wrong question")
+    if m.path_first == answer:
+        m.visit_first += 1
+        m.success += 1
+    elif m.path_second == answer:
+        m.visit_second += 1
+        m.success += 1
+    elif m.path_third == answer:
+        m.visit_third += 1
+        m.success += 1
+    elif m.path_fourth == answer:
+        m.visit_fourth += 1
+        m.success += 1
+    else:
+        return err(400, "答错了，你是猪么？")
+    db.session.commit()
+
+    n = MazeDb.query.filter_by(title = answer).first()
+    if n == None:
+        return err(400, "Hmm, 服务器出现了一些故障，请联系管理员")
+    n.visit += 1
+    db.session.commit()
+    return success({"msg":"success", "data":n.toDict()})
+
+@app.route('/api/v1/maze/jump', methods=['POST'])
+def mazeJump():
+    data = request.json
+    if data == None:
+        return err(400, "No json data")
+    try:
+        title = data['title']
+    except:
+        return err(400, "Wrong parameters")
+    m = MazeDb.query.filter_by(title = title).first()
+    if m == None:
+        return err(400, "根本没这个题，骗谁啊")
+    m.visit += 1
+    db.session.commit()
+    return success({"msg":"success", "data":m.toDict()})
         
 @app.route('/api/v1/challenge/answer/<link>', methods=['POST'])
 def challengeAnswer(link):
@@ -474,6 +549,37 @@ def challengeRank(link):
             solutions.sort(key = lambda x: (-x.score, float(re.search("\((.*?)\)",x.results.split('|')[-1]).groups()[0])))
 
         return render_template("challengeRank.html", data = [s.toDict(link) for s in solutions])
+@app.route('/maze/')
+def route_maze():
+    return render_template("maze.html")
+@app.route('/maze/validate')
+def mazeValidate():
+    titleDict = {}
+    titles = [(None, "1")]
+    invalidTitles = []
+    while titles:
+        before, title = titles.pop()
+        if title in titleDict:
+            titleDict[title] += 1
+            continue
+        else:
+            titleDict[title] = 1
+        m = MazeDb.query.filter_by(title = title).first()
+        if m == None:
+            invalidTitles.append((before, title))
+        else:
+            if m.path_first:
+                titles.append((title, m.path_first))
+            if m.path_second:
+                titles.append((title, m.path_second))
+            if m.path_third:
+                titles.append((title, m.path_third))
+            if m.path_fourth:
+                titles.append((title, m.path_fourth))
+        db.session.commit()
+    return "<pre>Titles: {}\nInvalid: {}\n</pre>".format(titleDict, invalidTitles)
+
+
 
 @app.route('/article/<link>')
 def articleContent(link):
