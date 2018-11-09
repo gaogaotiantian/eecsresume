@@ -7,6 +7,14 @@ showMaze = function(d) {
     $("#maze-title").text(d['data']['title']);
     $("#maze-question").text(d['data']['question']);
     $("#maze-stat").text('到达本关者' + d['data']['visit'].toString() + '位勇士，过关者' + d['data']['success'].toString() + '人')
+    if (d['treasure']) {
+        console.log("treasure")
+        $('#maze-treasure-button').removeClass("d-none");
+        $("#maze-treasure-button").attr("href", "treasure/"+d['treasure']['link']);
+    } else {
+        $('#maze-treasure-button').addClass("d-none");
+        $("#maze-treasure-button").attr("href", "#");
+    }
 }
 mazeJump = function() {
     var title = $("#maze-jump-input").val();
@@ -38,7 +46,6 @@ mazeJump = function() {
 mazeAnswer = function() {
     var title = $("#maze-title").text();
     var answer = $("#maze-answer-input").val();
-    console.log(title, answer)
     if (title && answer) {
         $.ajax({
             url: '/api/v1/maze/answer',

@@ -1,0 +1,24 @@
+<html>
+{% include 'header.html' %}
+<script src="/static/treasure.js" type="text/javascript"></script>
+<body class="text-center">
+  <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+    {% include 'navbar.html' %}
+    <main role="main" class="inner cover">
+      <div id="main-content">
+        <div>
+          <h1>THE MAZE TREASURE</h1>
+          <h3>恭喜您找到宝藏，但是这个宝藏如果不尽快使用，可能会被被人抢走哦！</h3>
+          <p>{{ description }}</p>
+          <textarea id="treasure-content" rows="10" link={{link}} class="form-control"></textarea>
+          <div id="treasure-error" class="alert alert-danger d-none"></div>
+          <button id="treasure-submit" class="btn btn-primary my-2">提交</button>
+        </div>
+      <div class="loader d-none"></div>
+    </main>
+    <footer class="mastfoot mt-auto">
+      <div>
+      </div>
+    </footer>
+</body>
+</html>

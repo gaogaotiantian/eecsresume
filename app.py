@@ -60,6 +60,14 @@ mail = Mail(app)
 basicAuth = BasicAuth(app)
 admin = Admin(app, name = 'eecsresume', template_mode='bootstrap3')
 
+chars = string.ascii_uppercase + string.digits
+def getShortLink():
+    while True:
+        s = ''.join(random.choice(chars) for _ in range(8))
+        check = TaskDb.query.filter_by(short_link = s).first()
+        if check == None:
+            return s
+
 class statusEnum(enum.Enum):
     sent = 1
     browse = 2
@@ -209,6 +217,23 @@ class MazeDb(db.Model):
         return {"title":self.title, "question":self.question,
                 "visit":self.visit, "success":self.success}
 
+class TreasureDb(db.Model):
+    __tablename__ = 'treasure'
+    id            = db.Column(db.Integer, primary_key = True)
+    treasure_type = db.Column(db.String(256))
+    description   = db.Column(db.Text)
+    link          = db.Column(db.String(128), default=getShortLink)
+    enabled       = db.Column(db.Boolean, server_default = "f")
+    closed        = db.Column(db.Boolean, server_default = "t")
+    maze_title    = db.Column(db.String(256))
+    rate          = db.Column(db.Float, server_default = "1")
+    content       = db.Column(db.Text)
+
+    def toDict(self):
+        return {"link":self.link,
+                "type":self.treasure_type, 
+                "description":self.description}
+
 db.create_all()
 
 admin.add_view(TaskModelView(TaskDb, db.session))
@@ -217,6 +242,7 @@ admin.add_view(ArticleModelView(ArticleDb, db.session))
 admin.add_view(ChallengeModelView(ProblemDb, db.session))
 admin.add_view(SolutionModelView(SolutionDb, db.session))
 admin.add_view(ModelView(MazeDb, db.session))
+admin.add_view(ModelView(TreasureDb, db.session))
 
 def getDriveService():
     service = build('drive', 'v3', credentials = credentials)
@@ -256,14 +282,6 @@ def sendConfirmEmail(email):
         print("Send confirmation to {}".format(email))
     except Exception as e:
         print(e)
-
-chars = string.ascii_uppercase + string.digits
-def getShortLink():
-    while True:
-        s = ''.join(random.choice(chars) for _ in range(6))
-        check = TaskDb.query.filter_by(short_link = s).first()
-        if check == None:
-            return s
 
 def success(dct):
     return make_response(jsonify(dct), 200)
@@ -422,6 +440,18 @@ def mazeAnswer():
         return err(400, "Hmm, 服务器出现了一些故障，请联系管理员")
     n.visit += 1
     db.session.commit()
+
+    # Check for treasures
+    t = TreasureDb.query.filter_by(maze_title = answer, closed = False).with_for_update().first()
+    if t != None:
+        try:
+            if random.uniform(0,1) < t.rate:
+                db.session.commit()
+                return success({"msg":"success", "data":n.toDict(), "treasure":t.toDict()})
+        except:
+            pass
+        
+    db.session.commit()
     return success({"msg":"success", "data":n.toDict()})
 
 @app.route('/api/v1/maze/jump', methods=['POST'])
@@ -441,6 +471,26 @@ def mazeJump():
     db.session.commit()
     return success({"msg":"success", "data":m.toDict()})
         
+@app.route('/api/v1/maze/treasure', methods=['POST'])
+def mazeTreasure():
+    data = request.json
+    if data == None:
+        return err(400, "No json data")
+    try:
+        link = data['link']
+        content = data['content']
+    except:
+        return err(400, "Wrong parameters")
+
+    t = TreasureDb.query.filter_by(link = link, enabled = True, closed = False).with_for_update().first()
+    if t == None:
+        return err(400, "这宝藏可能已经被人拿走了")
+    t.content = content
+    t.enabled = False
+    t.closed = True
+    db.session.commit()
+    return success({"msg":"success"})
+
 @app.route('/api/v1/challenge/answer/<link>', methods=['POST'])
 def challengeAnswer(link):
     challenge = ProblemDb.query.filter_by(link = link).first()
@@ -516,6 +566,7 @@ def submit():
 def route_comment():
     return render_template('comment.html')
 
+# For challenge
 @app.route('/challenge')
 @app.route('/challenge/')
 def route_challenge():
@@ -554,9 +605,22 @@ def challengeRank(link):
             solutions.sort(key = lambda x: (-x.score, float(re.search("\((.*?)\)",x.results.split('|')[-1]).groups()[0])))
 
         return render_template("challengeRank.html", data = [s.toDict(link) for s in solutions])
+
+
+# For the maze
 @app.route('/maze/')
 def route_maze():
     return render_template("maze.html")
+
+@app.route('/maze/treasure/<link>')
+def route_maze_treasure(link):
+    t = TreasureDb.query.filter_by(link = link).with_for_update().first()
+    if t != None and t.closed == False:
+        t.enabled = True
+        db.session.commit()
+        return render_template("treasure.html", description = t.description, link = t.link)
+    return "并没有这个宝藏，你是不是想钱想疯了？"
+
 @app.route('/maze/validate')
 def mazeValidate():
     titleDict = {}
@@ -583,7 +647,6 @@ def mazeValidate():
                 titles.append((title, m.path_fourth))
         db.session.commit()
     return "<pre>Titles: {}\nInvalid: {}\n</pre>".format(titleDict, invalidTitles)
-
 
 
 @app.route('/article/<link>')
