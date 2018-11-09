@@ -395,8 +395,9 @@ def mazeAnswer():
         return err(400, "Wrong parameters")
     if len(answer) == 0:
         return err(400, "Empty answer")
-    m = MazeDb.query.filter_by(title = title).first()
+    m = MazeDb.query.filter_by(title = title).with_for_update().first()
     if m == None:
+        db.session.commit()
         return err(400, "Wrong question")
     if m.path_first == answer:
         m.visit_first += 1
@@ -411,11 +412,13 @@ def mazeAnswer():
         m.visit_fourth += 1
         m.success += 1
     else:
+        db.session.commit()
         return err(400, randomCurse())
     db.session.commit()
 
-    n = MazeDb.query.filter_by(title = answer).first()
+    n = MazeDb.query.filter_by(title = answer).with_for_update().first()
     if n == None:
+        db.session.commit()
         return err(400, "Hmm, 服务器出现了一些故障，请联系管理员")
     n.visit += 1
     db.session.commit()
@@ -430,8 +433,9 @@ def mazeJump():
         title = data['title']
     except:
         return err(400, "Wrong parameters")
-    m = MazeDb.query.filter_by(title = title).first()
+    m = MazeDb.query.filter_by(title = title).with_for_update().first()
     if m == None:
+        db.session.commit()
         return err(400, "根本没这个题，骗谁啊")
     m.visit += 1
     db.session.commit()
