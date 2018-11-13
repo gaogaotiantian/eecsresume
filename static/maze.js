@@ -3,6 +3,7 @@ showMaze = function(d) {
     $("#maze-jump-error").addClass("d-none");
     $("#maze-answer-error").empty();
     $("#maze-answer-error").addClass("d-none");
+    $("#maze-jump-input").val("");
 
     $("#maze-title").text(d['data']['title']);
     $("#maze-question").text(d['data']['question']);
