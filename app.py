@@ -503,6 +503,8 @@ def challengeAnswer(link):
     try:
         user = data['user']
         answers = data['answer']
+        if len(user) == 0:
+            return err(400, "请输入用户名")
     except:
         return err(400, "Wrong parameters")
 
