@@ -17,6 +17,8 @@ $(function() {
         $("#nav-article").addClass("active");
     } else if (window.location.href.indexOf("maze") != -1) {
         $("#nav-maze").addClass("active");
+    } else if (window.location.href.indexOf("challenge") != -1) {
+        $("#nav-challenge").addClass("active");
     } else {
         $("#nav-home").addClass("active");
     }
