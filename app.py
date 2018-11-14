@@ -115,7 +115,8 @@ class ChallengeModelView(ModelView):
     column_formatters = dict(description=lambda v,c,m,p: m.description[:100] + '...', questions=lambda v,c,m,p: m.questions[:40] + '...')
 
 class SolutionModelView(ModelView):
-    column_formatters = dict(answer=lambda v,c,m,p: m.answer[:30] + '...')
+    column_formatters = dict(answers=lambda v,c,m,p: m.answers[:30] + '...')
+    column_filters = ('ques_id',"version")
 
 class TaskDb(db.Model):
     __tablename__ = 'task'
