@@ -194,9 +194,7 @@ class SolutionDb(db.Model):
     edit_time     = db.Column(db.DateTime, server_default = db.func.now(), onupdate = db.func.now())
 
     def toDict(self, link):
-        if link == 'black_and_white':
-            return {"user":self.user, "score":int(self.score), "results":self.results}
-        return {"user":self.user, "score":self.score, "results":self.results}
+        return {"user":self.user, "score":int(self.score), "results":self.results}
 
 class MazeDb(db.Model):
     __tablename__ = 'maze'
@@ -603,7 +601,7 @@ def challengeRank(link):
     if challenge == None:
         return "不许瞎跑，哪儿有这个链接"
     else:
-        solutions = SolutionDb.query.filter_by(ques_id = challenge.id, version = challenge.version).order_by(SolutionDb.score).limit(50).all()
+        solutions = SolutionDb.query.filter_by(ques_id = challenge.id, version = challenge.version).order_by(SolutionDb.score.desc()).limit(50).all()
         if link == "black_and_white":
             solutions.sort(key = lambda x: (-x.score, float(re.search("\((.*?)\)",x.results.split('|')[-1]).groups()[0])))
 
