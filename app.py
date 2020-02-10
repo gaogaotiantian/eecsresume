@@ -290,10 +290,12 @@ def getStat():
     monthModifyCount = TaskDb.query.filter(TaskDb.edit_time > monthTime).filter(TaskDb.status >= statusEnum.reviewed).count()
     totalReviewCount = TaskDb.query.filter(TaskDb.status >= statusEnum.browse).count()
     totalModifyCount = TaskDb.query.filter(TaskDb.status >= statusEnum.reviewed).count()
+    latestTime = TaskDb.query.filter(TaskDb.edit_time.isnot(None)).order_by(TaskDb.edit_time.desc()).first().edit_time
     
     stat['week'] = [weekReviewCount, weekModifyCount]
     stat['month'] = [monthReviewCount, monthModifyCount]
     stat['total'] = [totalReviewCount, totalModifyCount]
+    stat['latest'] = "{}".format(latestTime.strftime("%Y年%m月%d日"))
 
     return stat
 
@@ -575,6 +577,14 @@ def submit():
 @app.route('/comment')
 def route_comment():
     return render_template('comment.html')
+
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
+@app.route('/terms_of_service')
+def terms_of_service():
+    return render_template('terms_of_service.html')
 
 # For challenge
 @app.route('/challenge')

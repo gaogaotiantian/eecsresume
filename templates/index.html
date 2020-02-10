@@ -84,6 +84,7 @@
               <h5 class="card-title">战果统计</h5>
               <ul class="card-text">
                 <li>开始于2018年10月</li>
+                <li>上次活跃于{{stat.latest}}</li>
                 <li>本周内点评{{stat.week[0]}}篇，修改{{stat.week[1]}}篇</li> 
                 <li>本月内点评{{stat.month[0]}}篇，修改{{stat.month[1]}}篇</li> 
                 <li>共计点评{{stat.total[0]}}篇，修改{{stat.total[1]}}篇</li> 
@@ -112,8 +113,16 @@
       <div class="loader d-none"></div>
     </div>
     <footer class="mastfoot mt-auto py-2">
-      <div>
-        {{ footer.latest }}
+      <div class="d-flex justify-content-center">
+        <div class="px-3">
+          Copyright &copy 2020 Tian Gao
+        </div>
+        <div class="px-3">
+          <a href="/privacy">Privacy Policy</a>
+        </div>
+        <div class="px-3">
+          <a href="/terms_of_service">Terms of Service</a>
+        </div>
       </div>
     </footer>
 </body>

@@ -44,6 +44,7 @@ html,
 body {
   height: 100%;
   background-color: #FAFAFA;
+  background-image: url("background.png");
   font-family: helvetica, Georgia, 'Times New Roman', Times, "Microsoft YaHei", "微软雅黑", "STXiHei", "华文细黑", serif;
 }
 
@@ -60,6 +61,7 @@ body {
  */
 .masthead {
   background-color: #41d3bd;
+  background-image: linear-gradient(135deg, #41d3bd, #22af9a);
 }
 
 .masthead-brand {
@@ -118,7 +120,6 @@ h1,h2,h3,h4,h5,.lead {
   font-weight: 700;
 }
 .main-cover {
-  background-color: #f7f7f7;
   padding: 2rem;
   min-height: 75vh;
 }
@@ -148,8 +149,13 @@ h1,h2,h3,h4,h5,.lead {
  * Footer
  */
 .mastfoot {
-  background-color: #41d3bd;
-  color: rgba(0, 0, 0, .5);
+  font-size: 0.8rem;
+  background-color: #22af9a;
+  color: #fff;
+}
+
+.mastfoot a {
+  color: #fff;
 }
 
 .loader {
