@@ -59,36 +59,33 @@ body {
  * Header
  */
 .masthead {
-  margin-bottom: 2rem;
   background-color: #41d3bd;
 }
 
 .masthead-brand {
+  color: rgb(235, 255, 230);
+  padding-top: 0.25rem;
   margin-bottom: 0;
   padding-right: 10rem;
   font-family: 'Kalam', cursive;
 }
 
 .nav-masthead .nav-link {
-  padding: .25rem 0;
+  padding: 0.5rem 1rem;
   font-weight: 700;
-  color: rgba(0, 0, 0, .5);
+  color: rgb(235, 255, 230);
   background-color: transparent;
-  border-bottom: .25rem solid transparent;
+  border-bottom: .05rem solid transparent;
 }
 
 .nav-masthead .nav-link:hover,
 .nav-masthead .nav-link:focus {
-  border-bottom-color: rgba(0, 0, 0, .25);
-}
-
-.nav-masthead .nav-link + .nav-link {
-  margin-left: 1rem;
+  border-bottom-color: #ffffff;
 }
 
 .nav-masthead .active {
-  color: #222;
-  border-bottom-color: #000;
+  color: rgb(235, 255, 230);
+  border-bottom-color:rgb(235, 255, 230);
 }
 
 h1,h2,h3,h4,h5,.lead {
