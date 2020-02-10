@@ -556,11 +556,17 @@ def sitemap():
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html', footer=getFooter(), stat=getStat())
+    resp = make_response(render_template('index.html', footer=getFooter(), stat=getStat()))
+    resp.cache_control.max_age = 300
+    resp.cache_control.public  = True
+    return resp
 
 @app.route('/procedure')
 def procedure():
-    return render_template('procedure.html')
+    resp = make_response(render_template('procedure.html'))
+    resp.cache_control.max_age = 360000
+    resp.cache_control.public  = True
+    return resp
 
 @app.route('/about')
 def about():
@@ -568,23 +574,38 @@ def about():
 
 @app.route('/example')
 def example():
-    return render_template('example.html')
+    resp = make_response(render_template('example.html'))
+    resp.cache_control.max_age = 360000
+    resp.cache_control.public  = True
+    return resp
 
 @app.route('/submit')
 def submit():
-    return render_template('submit.html')
+    resp = make_response(render_template('submit.html'))
+    resp.cache_control.max_age = 360000
+    resp.cache_control.public  = True
+    return resp
 
 @app.route('/comment')
 def route_comment():
-    return render_template('comment.html')
+    resp = make_response(render_template('comment.html'))
+    resp.cache_control.max_age = 3600
+    resp.cache_control.public  = True
+    return resp
 
 @app.route('/privacy')
 def privacy():
-    return render_template('privacy.html')
+    resp = make_response(render_template('privacy.html'))
+    resp.cache_control.max_age = 360000
+    resp.cache_control.public  = True
+    return resp
 
 @app.route('/terms_of_service')
 def terms_of_service():
-    return render_template('terms_of_service.html')
+    resp = make_response(render_template('terms_of_service.html'))
+    resp.cache_control.max_age = 360000
+    resp.cache_control.public  = True
+    return resp
 
 # For challenge
 @app.route('/challenge')
@@ -679,13 +700,19 @@ def articleContent(link):
         article = articleRaw.toContent()
         title = article["title"]
         content = article["content"]
-    return render_template('articleContent.html', title=title, content=content)
+    resp = make_response(render_template('articleContent.html', title=title, content=content))
+    resp.cache_control.max_age = 36000
+    resp.cache_control.public  = True
+    return resp
 
 @app.route('/article')
 def article():
     articlesRaw = ArticleDb.query.order_by(ArticleDb.priority, ArticleDb.edit_time.desc()).all()
     articles = [a.toBrowse() for a in articlesRaw]
-    return render_template('article.html', articles = articles)
+    resp = make_response(render_template('article.html', articles = articles))
+    resp.cache_control.max_age = 36000
+    resp.cache_control.public  = True
+    return resp
 
 if __name__ == '__main__':
     app.run(debug = True)
