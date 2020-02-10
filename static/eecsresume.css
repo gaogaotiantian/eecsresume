@@ -239,7 +239,7 @@ h1,h2,h3,h4,h5,.lead {
 }
 
 .list-group {
-  min-width: 40rem;
+  min-width: 40vw;
 }
 
 .list-article {
