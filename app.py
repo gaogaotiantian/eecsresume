@@ -40,10 +40,6 @@ DATABASE_URL = None
 if os.environ.get('DATABASE_URL') != None:
     DATABASE_URL = os.environ.get('DATABASE_URL')
 
-credentialRaw = os.environ.get('GOOGLE_APP_CREDENTIAL')
-credentials = service_account.Credentials.from_service_account_info(json.loads(credentialRaw))
-
-
 app = Flask(__name__, static_url_path = '/static')
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SECRET_KEY'] = os.urandom(24).hex()
@@ -146,7 +142,12 @@ class CommentDb(db.Model):
                 email = "anonymous"
             else:
                 lst = self.email.split('@')
-                lst[0] = lst[0][0] +'*'*(len(lst[0])-2) + lst[0][-1]
+                if len(lst[0]) == 1:
+                    lst[0] = '*'
+                elif len(lst[0]) == 2:
+                    lst[0] = '**'
+                else:
+                    lst[0] = lst[0][0] +'*'*(len(lst[0])-2) + lst[0][-1]
                 email = '@'.join(lst)
             return {"email":email, "type":self.type.name, 'comment':self.comment, 'edit_time': self.edit_time, 'score':self.score}
         except:
@@ -243,16 +244,6 @@ admin.add_view(SolutionModelView(SolutionDb, db.session))
 admin.add_view(ModelView(MazeDb, db.session))
 admin.add_view(ModelView(TreasureDb, db.session))
 
-def getDriveService():
-    service = build('drive', 'v3', credentials = credentials)
-
-    return service
-
-def getGmailService():
-    service = build('gmail', 'v1', credentials = credentials)
-
-    return service
-
 def sendEmail(pdfRaw, email):
     message = Message("Resume review from EECSResume",
             sender=("EECSResume", "eecsresume@gmail.com"),
@@ -287,6 +278,24 @@ def success(dct):
 
 def err(err_code, err_msg):
     return make_response(jsonify({"err_msg":err_msg}), err_code)
+
+def getStat():
+    stat = {}
+
+    weekTime = datetime.datetime.utcnow() - datetime.timedelta(days = 7)
+    monthTime = datetime.datetime.utcnow() - datetime.timedelta(days = 30)
+    weekReviewCount = TaskDb.query.filter(TaskDb.edit_time > weekTime).filter(TaskDb.status >= statusEnum.browse).count()
+    weekModifyCount = TaskDb.query.filter(TaskDb.edit_time > weekTime).filter(TaskDb.status >= statusEnum.reviewed).count()
+    monthReviewCount = TaskDb.query.filter(TaskDb.edit_time > monthTime).filter(TaskDb.status >= statusEnum.browse).count()
+    monthModifyCount = TaskDb.query.filter(TaskDb.edit_time > monthTime).filter(TaskDb.status >= statusEnum.reviewed).count()
+    totalReviewCount = TaskDb.query.filter(TaskDb.status >= statusEnum.browse).count()
+    totalModifyCount = TaskDb.query.filter(TaskDb.status >= statusEnum.reviewed).count()
+    
+    stat['week'] = [weekReviewCount, weekModifyCount]
+    stat['month'] = [monthReviewCount, monthModifyCount]
+    stat['total'] = [totalReviewCount, totalModifyCount]
+
+    return stat
 
 def getFooter():
     footer = {}
@@ -545,7 +554,7 @@ def sitemap():
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html', footer=getFooter())
+    return render_template('index.html', footer=getFooter(), stat=getStat())
 
 @app.route('/procedure')
 def procedure():

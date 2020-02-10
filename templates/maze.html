@@ -2,30 +2,32 @@
 {% include 'header.html' %}
 <script src="/static/maze.js" type="text/javascript"></script>
 <body class="text-center">
-  <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+  <div class="cover-container d-flex w-100 h-100 mx-auto flex-column">
     {% include 'navbar.html' %}
-    <main role="main" class="inner cover">
-      <div id="main-content">
-        <div id="maze-start">
-          <h1>THE MAZE</h1>
-          <h3 class="lead py-1">请输入你想起始的关卡名，如果你是第一次玩，输入1</h3>
-          <p>答案只会包含小写字母、数字和符号</p>
-          <input type="text" class="form-control mb-3" id="maze-jump-input" placeholder="输入关卡名">
-          <div id="maze-jump-error" class="alert alert-danger d-none"></div>
-          <button id="maze-jump-submit" class="btn btn-primary">去这关咯</button>
+    <div class="d-flex justify-content-center">
+      <main role="main" class="inner cover">
+        <div id="main-content">
+          <div id="maze-start">
+            <h1>THE MAZE</h1>
+            <h3 class="lead py-1">请输入你想起始的关卡名，如果你是第一次玩，输入1</h3>
+            <p>答案只会包含小写字母、数字和符号</p>
+            <input type="text" class="form-control mb-3" id="maze-jump-input" placeholder="输入关卡名">
+            <div id="maze-jump-error" class="alert alert-danger d-none"></div>
+            <button id="maze-jump-submit" class="btn btn-primary">去这关咯</button>
+          </div>
+          <div id="maze-play" class="d-none">
+            <h1>THE MAZE</h1>
+            <h3 id="maze-title"></h3>
+            <p><pre id="maze-question" style="font-size:1.2em; white-space:pre-wrap"></pre></p>
+            <input type="text" class="form-control mb-3" id="maze-answer-input" placeholder="输入你的答案">
+            <div id="maze-answer-error" class="alert alert-danger d-none"></div>
+            <button id="maze-answer-submit" class="btn btn-primary">不自量力地尝试一下</button>
+            <a id="maze-treasure-button" role="button" href="#" class="btn btn-danger d-none" target="_blank">这里有个宝藏</a>
+          </div>
         </div>
-        <div id="maze-play" class="d-none">
-          <h1>THE MAZE</h1>
-          <h3 id="maze-title"></h3>
-          <p><pre id="maze-question" style="font-size:1.2em; white-space:pre-wrap"></pre></p>
-          <input type="text" class="form-control mb-3" id="maze-answer-input" placeholder="输入你的答案">
-          <div id="maze-answer-error" class="alert alert-danger d-none"></div>
-          <button id="maze-answer-submit" class="btn btn-primary">不自量力地尝试一下</button>
-          <a id="maze-treasure-button" role="button" href="#" class="btn btn-danger d-none" target="_blank">这里有个宝藏</a>
-        </div>
-      </div>
-      <div class="loader d-none"></div>
-    </main>
+        <div class="loader d-none"></div>
+      </main>
+    </div>
     <footer class="mastfoot mt-auto">
       <div>
         <p id="maze-stat"></p>

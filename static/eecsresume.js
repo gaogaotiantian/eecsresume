@@ -27,17 +27,19 @@ $(function() {
     $("#upload-file-button").click(function() {
     })  
 
-    $("#user-email").change(function() {
+    $("#user-email").keypress(function() {
         if (validateEmail($(this).val())) {
             $("#submit-resume").prop("disabled", false);
             $("#submit-resume").removeClass("btn-secondary");
             $("#submit-resume").addClass("btn-primary");
-            $("#email-error-text").removeClass("d-flex");
+            $("#user-email").addClass("is-valid");
+            $("#user-email").removeClass("is-invalid");
         } else {
             $("#submit-resume").prop("disabled", true);
             $("#submit-resume").removeClass("btn-primary");
             $("#submit-resume").addClass("btn-secondary");
-            $("#email-error-text").addClass("d-flex");
+            $("#user-email").addClass("is-invalid");
+            $("#user-email").removeClass("is-valid");
         }
     })
 

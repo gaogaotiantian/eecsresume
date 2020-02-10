@@ -1,20 +1,92 @@
 <html>
 {% include 'header.html' %}
 <body class="text-center">
-  <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+  <div class="cover-container d-flex w-100 h-100 mx-auto flex-column">
     {% include 'navbar.html' %}
-    <main role="main" class="inner cover">
-      <h1 class="cover-heading">Step 1</h1>
-      <p class="lead">输入Email，提交简历</p>
-      <h1 class="cover-heading">Step 2</h1>
-      <p class="lead">在两到三个工作日内，会收到我的点评。点评会比较简略，是我对简历的总体看法</p>
-      <h1 class="cover-heading">Step 3</h1>
-      <p class="lead">如果你对点评已经非常满意，到这里就可以拿着简历去自己修改啦～如果你认可我的看法，并且希望我帮助你修改简历，那就进入收费阶段。修改一份简历 $140（这个价格比开始涨了不少，因为我发现我平均在每一篇resume上花的时间大概有3个小时以上，我希望把这个时间留给真正很需要的人。）</p>
-      <h1 class="cover-heading">Step 4</h1>
-      <p class="lead">交费后，我会根据你的简历，提出详细的修改建议，在这个过程中，我们会一直沟通，修改多稿，直到我们都对Resume满意为止。如果你付费后对我的修改建议表示不满，认为钱花冤枉了，可以在第一次我提出修改建议的时候停止服务，我会退还你80%的费用</p>
-      <h1 class="cover-heading">Step 5</h1>
-      <p class="lead">拿着你理想的简历，去斩获心爱的offer</p>
-    </main>
+    <div class="d-flex justify-content-center">
+      <main role="main" class="cover inner">
+        <div id="intro-cards-div" class="d-flex justify-content-center flex-wrap">
+          <div class="card card-intro">
+            <div class="card-body">
+              <h5 class="card-title">提交简历</h5>
+              <p class="card-text">
+                通过<a href="/">网站</a>输入email上传简历，上传成功会收到确认email。
+              </p> 
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center">
+            <i class="fas fa-arrow-right fa-2x"></i>
+          </div>
+
+          <div class="card card-intro">
+            <div class="card-body">
+              <h5 class="card-title">免费点评</h5>
+              <p class="card-text">
+                耐心等待几天，会收到我的点评email。这个点评是我对简历的大概看法，包括水准评价和简单的改进方向
+              </p> 
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center">
+            <i class="fas fa-arrow-right fa-2x"></i>
+          </div>
+
+          <div class="card card-intro">
+            <div class="card-body">
+              <h5 class="card-title">付费</h5>
+              <p class="card-text">
+                如果你需要我帮忙详细修改简历，就要进入付费阶段。我会通过email告诉你我的收款方式，现在的标准价格是<b>$140</b>，最终价格以邮件沟通为准。
+              </p> 
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center">
+            <i class="fas fa-arrow-right fa-2x"></i>
+          </div>
+
+          <div class="card card-intro">
+            <div class="card-body">
+              <h5 class="card-title">修改</h5>
+              <p class="card-text">
+                收到钱之后，我会尽快整理出一份详细的修改意见发给你，最终动笔修改的人是你。之所以采取这种方式，是因为大部分人的简历问题根本就不是遣词造句，是内容的缺失，而你做了什么东西，只有你自己知道，我没办法替你写。
+              </p> 
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center">
+            <i class="fas fa-arrow-right fa-2x"></i>
+          </div>
+
+          <div class="card card-intro">
+            <div class="card-body">
+              <h5 class="card-title">提升</h5>
+              <p class="card-text">
+                如果你对第一次的修改意见有任何形式的不满意，都可以在第一次修改之后要求退80%的费用。否则我们开始多次修改，反复多稿，直到写出一份让双方都满意的简历为止。
+              </p> 
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center">
+            <i class="fas fa-arrow-right fa-2x"></i>
+          </div>
+
+          <div class="card card-intro">
+            <div class="card-body">
+              <h5 class="card-title">定稿</h5>
+              <p class="card-text">
+                在双方都表示满意之后，简历修改完成。如果再有后续项目补充，我会尽可能帮忙看一下，但是无法保证无限期服务。修改结束后欢迎到网站评价区评论。
+              </p> 
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center">
+            <i class="fas fa-check fa-2x"></i>
+          </div>
+
+        </div>
+      </main>
+    </div>
     <footer class="mastfoot mt-auto">
     </footer>
 </body>
