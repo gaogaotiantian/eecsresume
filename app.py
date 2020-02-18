@@ -119,7 +119,7 @@ class TaskDb(db.Model):
     id         = db.Column(db.Integer, primary_key = True)
     short_link = db.Column(db.String(10))
     add_time   = db.Column(db.DateTime, server_default = db.func.now())
-    edit_time  = db.Column(db.DateTime, onupdate = db.func.now())
+    edit_time  = db.Column(db.DateTime, server_default = db.func.now(), onupdate = db.func.now())
     email      = db.Column(db.String(128))
     status     = db.Column(db.Enum(statusEnum))
     review_time = db.Column(db.Integer)
@@ -280,6 +280,35 @@ def err(err_code, err_msg):
     return make_response(jsonify({"err_msg":err_msg}), err_code)
 
 def getStat():
+    def toActivity(task):
+        ret = {}
+        if task.edit_time:
+            ret["time"] = task.edit_time.strftime("%Y/%m/%d")
+        else:
+            ret["time"] = None
+        lst = task.email.split('@')
+        if len(lst[0]) == 1:
+            lst[0] = '*'
+        elif len(lst[0]) == 2:
+            lst[0] = '**'
+        else:
+            middle = '*'*(len(lst[0])-2)
+            lst[0] = lst[0][0] + middle + lst[0][-1]
+        ret["email"] = '@'.join(lst)
+        if (task.status == statusEnum.sent):
+            ret["tag"] = "等待点评"
+            ret["tag_type"] = "danger"
+        elif (task.status == statusEnum.browse):
+            ret["tag"] = "点评完毕"
+            ret["tag_type"] = "warning"
+        elif (task.status == statusEnum.reviewed):
+            ret["tag"] = "第{}次修改".format(task.review_time or 1)
+            ret["tag_type"] = "primary"
+        elif (task.status == statusEnum.finish):
+            ret["tag"] = "完稿"
+            ret["tag_type"] = "success"
+        return ret
+
     stat = {}
 
     weekTime = datetime.datetime.utcnow() - datetime.timedelta(days = 7)
@@ -291,11 +320,15 @@ def getStat():
     totalReviewCount = TaskDb.query.filter(TaskDb.status >= statusEnum.browse).count()
     totalModifyCount = TaskDb.query.filter(TaskDb.status >= statusEnum.reviewed).count()
     latestTime = TaskDb.query.filter(TaskDb.edit_time.isnot(None)).order_by(TaskDb.edit_time.desc()).first().edit_time
+
+    latestTasks = TaskDb.query.filter(TaskDb.edit_time > monthTime).order_by(TaskDb.edit_time.desc())
+    latestActivities = map(toActivity, latestTasks)
     
     stat['week'] = [weekReviewCount, weekModifyCount]
     stat['month'] = [monthReviewCount, monthModifyCount]
     stat['total'] = [totalReviewCount, totalModifyCount]
     stat['latest'] = "{}".format(latestTime.strftime("%Y年%m月%d日"))
+    stat['activities'] = list(latestActivities)
 
     return stat
 

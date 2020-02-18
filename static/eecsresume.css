@@ -145,6 +145,17 @@ h1,h2,h3,h4,h5,.lead {
   color: #1b4b44;
 }
 
+.card-status {
+  max-width: 80vw;
+  overflow-x:scroll;
+  font-family: Roboto;
+}
+
+.activity-time {
+  font-size: 0.85rem;
+  color: #666;
+}
+
 /*
  * Footer
  */
