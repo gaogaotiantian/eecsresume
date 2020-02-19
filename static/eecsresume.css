@@ -146,9 +146,28 @@ h1,h2,h3,h4,h5,.lead {
 }
 
 .card-status {
+  color: rgba(0,0,0,0)!important;
   max-width: 80vw;
-  overflow-x:scroll;
+  overflow-x: scroll;
   font-family: Roboto;
+  transition: 0.5s;
+}
+
+.card-status:hover {
+  color: rgba(0,0,0,0.2)!important;
+}
+
+.card-status::-webkit-scrollbar {
+  height: 8px;
+}
+
+.card-status::-webkit-scrollbar-thumb {
+  border-radius: 15px;
+  box-shadow: inset 0 0 0 5px;
+}
+
+.activity-email {
+  color: #333;
 }
 
 .activity-time {
