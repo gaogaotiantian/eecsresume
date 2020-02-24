@@ -3,6 +3,22 @@ function validateEmail(email) {
     return re.test(String(email).toLowerCase());
 }
 
+function handleEmailChange() {
+    if (validateEmail($("#user-email").val())) {
+        $("#submit-resume").prop("disabled", false);
+        $("#submit-resume").removeClass("btn-secondary");
+        $("#submit-resume").addClass("btn-primary");
+        $("#user-email").addClass("is-valid");
+        $("#user-email").removeClass("is-invalid");
+    } else {
+        $("#submit-resume").prop("disabled", true);
+        $("#submit-resume").removeClass("btn-primary");
+        $("#submit-resume").addClass("btn-secondary");
+        $("#user-email").addClass("is-invalid");
+        $("#user-email").removeClass("is-valid");
+    }
+}
+
 $(function() {
     // Nav bar functions
     if (window.location.href.indexOf("procedure") != -1) {
@@ -27,24 +43,13 @@ $(function() {
     $("#upload-file-button").click(function() {
     })  
 
-    $("#user-email").keypress(function() {
-        if (validateEmail($(this).val())) {
-            $("#submit-resume").prop("disabled", false);
-            $("#submit-resume").removeClass("btn-secondary");
-            $("#submit-resume").addClass("btn-primary");
-            $("#user-email").addClass("is-valid");
-            $("#user-email").removeClass("is-invalid");
-        } else {
-            $("#submit-resume").prop("disabled", true);
-            $("#submit-resume").removeClass("btn-primary");
-            $("#submit-resume").addClass("btn-secondary");
-            $("#user-email").addClass("is-invalid");
-            $("#user-email").removeClass("is-valid");
-        }
+    $("#user-email").keyup(function() {
+        handleEmailChange();
     })
 
     $("#submit-resume").click(function(e) {
         e.preventDefault();
+        handleEmailChange();
         if (!$("#submit-resume").prop("disabled")) {
             $("#upload-file-input").click();
         }
@@ -80,6 +85,11 @@ $(function() {
         }
         
     })
+
+    // Initialize popover
+    $('#email-popover').popover({
+        trigger: "focus"
+    });
 
     // Main page functions end
     

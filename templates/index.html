@@ -100,11 +100,12 @@
         
         <hr>
 
-        <div class="my-4">
+        <div class="mt-4">
           <form id="upload-form" action="/api/v1/task" method="post" enctype="multipart/form-data" class="">
-            <label class="index-page-label">输入Email，上传简历，收获免费点评</label>
-            <div class="form-group py-1 d-flex justify-content-center">
-              <input type="email" class="form-control" id="user-email" placeholder="Enter Email">
+            <!--<label class="index-page-label">输入Email，上传简历，收获免费点评</label>-->
+            <div class="form-group py-1 d-flex justify-content-center align-items-center">
+              <input type="email" class="form-control" id="user-email" placeholder="输入Email，上传简历，收获免费点评">
+              <span><a id="email-popover" class="pl-2" href="javascript:void(0)" data-toggle="popover" data-content="在左侧的输入栏输入email地址后点击“提交简历”按钮上传简历。我们不会向任何第三方机构分享您的email和简历。"><i class="fas fa-info-circle"></i></a></span>
             </div>
             <input id="upload-file-input" type="file" name="resume" class="custom-file-input d-none">
             <div id="email-error-text" class="invalid-feedback">输入一个正确的email地址</div>
@@ -114,34 +115,34 @@
             <div id="upload-error-text" class="invalid-feedback">请上传一个小于2MB的pdf文档</div>
           </form>
         </div>
-          <div>
-            <div class="card card-status">
-              <div class="card-body p-1">
-                <div class="card-text d-flex">
-                  {% for act in stat.activities %}
-                  <div class="activity-wrap mx-2">
-                    <div class="activity-email">
-                      {{act.email}}
-                    </div>
-                    <div class="d-flex align-items-center">
-                      <span class="activity-tag mx-1 badge badge-{{act.tag_type}}">
-                        {{act.tag}}
-                      </span>
-                      <span class="activity-time">
-                        {{act.time}}
-                      </span>
-                    </div>
-                  </div>
-                  {% endfor %}
-                </div> 
-              </div>
-            </div>
-          </div>
       </main>
       <div class="loader d-none"></div>
     </div>
-    <footer class="mastfoot mt-auto py-2">
-      <div class="d-flex justify-content-center">
+    <footer class="mt-auto">
+      <div class="d-flex justify-content-center mb-2">
+        <div class="card card-status">
+          <div class="card-body p-1">
+            <div class="card-text d-flex">
+              {% for act in stat.activities %}
+              <div class="activity-wrap mx-2">
+                <div class="activity-email">
+                  {{act.email}}
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="activity-tag mx-1 badge badge-{{act.tag_type}}">
+                    {{act.tag}}
+                  </span>
+                  <span class="activity-time">
+                    {{act.time}}
+                  </span>
+                </div>
+              </div>
+              {% endfor %}
+            </div> 
+          </div>
+        </div>
+      </div>
+      <div class="mastfoot d-flex justify-content-center py-1">
         <div class="px-3">
           Copyright &copy 2020 Tian Gao
         </div>

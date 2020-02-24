@@ -30,9 +30,17 @@ a:hover {
 }
 
 .btn-submit {
-  padding: 0.5rem 1.0rem;
+  padding: 0.5rem 3rem;
   font-weight: 700;
   font-size: 1.2rem;
+  border: none;
+  background-image: linear-gradient(45deg, #f57316, #ff3c16);
+}
+
+.btn-submit:disabled {
+  color:#fff;
+  border: none;
+  opacity: 0.5;
 }
 
 
@@ -106,6 +114,7 @@ h1,h2,h3,h4,h5,.lead {
 
 .main-title {
   color: #22af9a;
+  text-shadow: 1px 1px 1px #a6dcbb77;
 }
 
 /*
@@ -173,6 +182,10 @@ h1,h2,h3,h4,h5,.lead {
 .activity-time {
   font-size: 0.85rem;
   color: #666;
+}
+
+#email-popover {
+  color: #6c757d;
 }
 
 /*
