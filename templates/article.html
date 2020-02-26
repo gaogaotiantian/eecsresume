@@ -5,11 +5,20 @@
     {% include 'navbar.html' %}
     <div class="d-flex justify-content-center mb-auto" style="min-height:85vh">
       <main role="main" class="inner mt-4">
-        <ul class="list-group">
-          {% for article in articles %}
-          <li class="list-article list-group-item"><a href="/article/{{ article.link }}">{{ article.title }}</a></li>
-          {% endfor %}
-        </ul>
+        <div class="mb-4">
+          <h3>实用工具</h3>
+          <ul class="list-group">
+            <li class="list-article list-group-item"><a href="https://docs.google.com/document/d/1LIA3dVtQstpSfyno8fIVb9caVUgklrrDCRx5f1lVjL8/edit?usp=sharing" target="_blank">一个朴素好用的简历模板(Google Docs)</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>长篇大论</h3>
+          <ul class="list-group">
+            {% for article in articles %}
+            <li class="list-article list-group-item"><a href="/article/{{ article.link }}">{{ article.title }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
       </main>
     </div> 
   </div>
