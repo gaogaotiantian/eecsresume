@@ -283,6 +283,16 @@ h1,h2,h3,h4,h5,.lead {
   padding-inline-start: 20px;
 }
 
+.info-box {
+  box-shadow: 1px 2px 7px -1px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(0,0,0,.125);
+  border-radius: .25rem;
+  color: #1b4b44;
+  background-color: #fff;
+  margin: 0.5rem;
+  padding: 0.3rem;
+}
+
 .fa-check,
 .fa-arrow-right {
   color: #22af9a;
