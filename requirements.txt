@@ -2,7 +2,7 @@ blinker==1.4
 cachetools==2.1.0
 Click==7.0
 Flask==1.0.2
-Flask-Admin==1.5.2
+Flask-Admin==1.5.6
 Flask-BasicAuth==0.2.0
 Flask-Cors==3.0.6
 Flask-Mail==0.9.1
