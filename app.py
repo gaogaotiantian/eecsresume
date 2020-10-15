@@ -360,7 +360,7 @@ def task():
         data = request.json
 
         try:
-            email = formData["email"][0]
+            email = formData["email"]
         except:
             return err(400, "Wrong parameters")
 
