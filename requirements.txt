@@ -13,7 +13,7 @@ google-auth==1.5.1
 google-auth-httplib2==0.0.3
 greenlet==0.4.15
 gunicorn==19.9.0
-httplib2==0.18.0
+httplib2==0.19.0
 itsdangerous==0.24
 Jinja2==2.11.2
 Markdown==3.0.1
