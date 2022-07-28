@@ -357,12 +357,14 @@ def task():
         formData = dict(request.form)
 
         if f == None:
+            print("Can not find attached file")
             return err(400, "Can not find attached file. It should be a pdf file.")
         data = request.json
 
         try:
             email = formData["email"]
         except:
+            print(f"Wrong parameters: {formData}")
             return err(400, "Wrong parameters")
 
         one_day_ago = datetime.datetime.utcnow() - datetime.timedelta(days=1)
