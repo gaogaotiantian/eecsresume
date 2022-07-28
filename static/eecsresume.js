@@ -74,10 +74,14 @@ $(function() {
                 success: function(d, st, xhr) {
                     window.location.replace("./submit");
                 },
-                error: function(d, st, xhr) {
+                error: function(xhr, st, thrownError) {
                     $(".loader").addClass("d-none");
                     $("#main-content").removeClass("d-none");
-                    alert("服务器出现错误！请稍后再试。");
+                    if (xhr.status == 429) {
+                        alert("24小时内已经成功上传过简历");
+                    } else {
+                        alert("服务器出现错误！请稍后再试。");
+                    }
                 }
             })
         } else {

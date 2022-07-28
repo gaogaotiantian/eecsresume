@@ -369,7 +369,7 @@ def task():
         t = TaskDb.query.filter_by(email = email).filter(TaskDb.add_time > one_day_ago).first()
 
         if t:
-            return err(400, "You already submitted resume in 24 hours")
+            return err(429, "You already submitted resume in 24 hours")
 
         shortLink = getShortLink()
 
