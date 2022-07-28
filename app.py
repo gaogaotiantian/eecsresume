@@ -364,6 +364,12 @@ def task():
         except:
             return err(400, "Wrong parameters")
 
+        one_day_ago = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        t = TaskDb.query.filter_by(email = email).filter(TaskDb.add_time > one_day_ago).first()
+
+        if t:
+            return err(400, "You already submitted resume in 24 hours")
+
         shortLink = getShortLink()
 
         # Google Drive part
