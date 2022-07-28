@@ -353,6 +353,7 @@ def getAvrScore():
 @app.route('/api/v1/task', methods = ['GET', 'POST'])
 def task():
     if request.method == 'POST':
+        print(f"POST - {request}")
         f = request.files.get("resume")
         formData = dict(request.form)
 
