@@ -353,14 +353,12 @@ def getAvrScore():
 @app.route('/api/v1/task', methods = ['GET', 'POST'])
 def task():
     if request.method == 'POST':
-        print(f"POST - {request}")
         f = request.files.get("resume")
         formData = dict(request.form)
 
         if f == None:
             print("Can not find attached file")
-            return err(400, "Can not find attached file. It should be a pdf file.")
-        data = request.json
+            return err(401, "Can not find attached file. It should be a pdf file.")
 
         try:
             email = formData["email"]
