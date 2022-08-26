@@ -5,16 +5,10 @@ import string
 import enum
 import random
 import datetime
-import io
-import json
-import base64
 import re
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
 
 # other published packages
-from flask import Flask, request, send_file, render_template, make_response, jsonify, Response, Markup, send_from_directory
+from flask import Flask, request, render_template, make_response, jsonify, Response, Markup, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from flask_cors import CORS
@@ -22,13 +16,6 @@ from flask_admin import Admin
 from flask_admin.contrib import sqla
 from flask_basicauth import BasicAuth
 from werkzeug.exceptions import HTTPException
-
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaIoBaseUpload
-from httplib2 import Http
-from oauth2client.client import OAuth2WebServerFlow
-from oauth2client import file, client, tools
-from google.oauth2 import service_account
 
 import markdown
 
