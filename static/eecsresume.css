@@ -103,6 +103,7 @@ body:before {
   padding: 0.5vh 1vw;
   margin: 0 0.5vw;
   font-weight: 700;
+  font-size: 1.1rem;
   color: rgb(235, 255, 230);
   background-color: transparent;
   border-bottom: .05rem solid transparent;
@@ -132,6 +133,7 @@ h1,h2,h3,h4,h5,.lead {
 }
 
 .main-title {
+  font-size: 3rem;
   color: #22af9a;
   text-shadow: 1px 1px 1px #a6dcbb77;
 }
