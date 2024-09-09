@@ -299,8 +299,10 @@ def getStat():
 
     stat = {}
 
+    dayTime = datetime.datetime.utcnow() - datetime.timedelta(days = 1)
     weekTime = datetime.datetime.utcnow() - datetime.timedelta(days = 7)
     monthTime = datetime.datetime.utcnow() - datetime.timedelta(days = 30)
+    daySubmitCount = TaskDb.query.filter(TaskDb.add_time > dayTime).count()
     weekReviewCount = TaskDb.query.filter(TaskDb.edit_time > weekTime).filter(TaskDb.status >= statusEnum.browse).count()
     weekModifyCount = TaskDb.query.filter(TaskDb.edit_time > weekTime).filter(TaskDb.status >= statusEnum.reviewed).count()
     monthReviewCount = TaskDb.query.filter(TaskDb.edit_time > monthTime).filter(TaskDb.status >= statusEnum.browse).count()
@@ -312,6 +314,7 @@ def getStat():
     latestTasks = TaskDb.query.filter(TaskDb.edit_time > monthTime).order_by(TaskDb.edit_time.desc())
     latestActivities = map(toActivity, latestTasks)
     
+    stat['daySubmitCount'] = daySubmitCount
     stat['week'] = [weekReviewCount, weekModifyCount]
     stat['month'] = [monthReviewCount, monthModifyCount]
     stat['total'] = [totalReviewCount, totalModifyCount]
